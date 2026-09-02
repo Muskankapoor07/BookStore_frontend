@@ -1,0 +1,167 @@
+<div class="auth-container">
+  <!-- Left Panel - Illustration -->
+  <div class="auth-left">
+    <div class="illustration-wrapper">
+      <img src="assets/images/book-shopping.png" alt="Online Book Shopping" class="illustration" />
+    </div>
+    <h2 class="brand-title">ONLINE BOOK SHOPPING</h2>
+  </div>
+
+  <!-- Right Panel - Forms -->
+  <div class="auth-right">
+    <!-- Tab Headers -->
+    <div class="tab-header">
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'login'"
+        (click)="switchTab('login')"
+        id="login-tab"
+      >
+        LOGIN
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="activeTab === 'signup'"
+        (click)="switchTab('signup')"
+        id="signup-tab"
+      >
+        SIGNUP
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    <form
+      *ngIf="activeTab === 'login'"
+      [formGroup]="loginForm"
+      (ngSubmit)="onLogin()"
+      class="auth-form login-form"
+      id="login-form"
+    >
+      <div class="form-group" [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+        <label for="login-email">Email Id</label>
+        <input
+          type="email"
+          id="login-email"
+          formControlName="email"
+          placeholder="Enter your email"
+        />
+        <span class="error-msg" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          Enter a valid email
+        </span>
+      </div>
+
+      <div class="form-group" [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        <label for="login-password">Password</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showLoginPassword ? 'text' : 'password'"
+            id="login-password"
+            formControlName="password"
+            placeholder="Enter your password"
+          />
+          <button type="button" class="toggle-password" (click)="toggleLoginPassword()" id="toggle-login-password">
+            <!-- Eye icon -->
+            <svg *ngIf="!showLoginPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <!-- Eye-off icon -->
+            <svg *ngIf="showLoginPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+        <span class="error-msg" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          Password is required (min 6 chars)
+        </span>
+        <a href="#" class="forgot-link" id="forgot-password-link">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="submit-btn" id="login-submit-btn">Login</button>
+
+      <div class="divider-line">
+        <span>OR</span>
+      </div>
+
+      <div class="social-buttons">
+        <button type="button" class="social-btn google" id="google-login-btn">Google</button>
+      </div>
+    </form>
+
+    <!-- Signup Form -->
+    <form
+      *ngIf="activeTab === 'signup'"
+      [formGroup]="signupForm"
+      (ngSubmit)="onSignup()"
+      class="auth-form signup-form"
+      id="signup-form"
+    >
+      <div class="form-group" [class.error]="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched">
+        <label for="signup-fullname">Full Name</label>
+        <input
+          type="text"
+          id="signup-fullname"
+          formControlName="fullName"
+          placeholder="Enter full name"
+        />
+        <span class="error-msg" *ngIf="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched">
+          Enter full name
+        </span>
+      </div>
+
+      <div class="form-group" [class.error]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+        <label for="signup-email">Email Id</label>
+        <input
+          type="email"
+          id="signup-email"
+          formControlName="email"
+          placeholder="Enter your email"
+        />
+        <span class="error-msg" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+          Enter a valid email
+        </span>
+      </div>
+
+      <div class="form-group" [class.error]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+        <label for="signup-password">Password</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showSignupPassword ? 'text' : 'password'"
+            id="signup-password"
+            formControlName="password"
+            placeholder="Enter your password"
+          />
+          <button type="button" class="toggle-password" (click)="toggleSignupPassword()" id="toggle-signup-password">
+            <svg *ngIf="!showSignupPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg *ngIf="showSignupPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+        <span class="error-msg" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+          Password is required (min 6 chars)
+        </span>
+      </div>
+
+      <div class="form-group" [class.error]="signupForm.get('mobile')?.invalid && signupForm.get('mobile')?.touched">
+        <label for="signup-mobile">Mobile Number</label>
+        <input
+          type="tel"
+          id="signup-mobile"
+          formControlName="mobile"
+          placeholder="Enter mobile number"
+        />
+        <span class="error-msg" *ngIf="signupForm.get('mobile')?.invalid && signupForm.get('mobile')?.touched">
+          Enter a valid 10-digit mobile number
+        </span>
+      </div>
+
+      <button type="submit" class="submit-btn" id="signup-submit-btn">Signup</button>
+    </form>
+  </div>
+</div>
