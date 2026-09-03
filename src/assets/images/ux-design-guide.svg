@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220" width="160" height="220">
+  <rect width="160" height="220" fill="#ffffff" stroke="#cccccc"/>
+  <rect x="15" y="15" width="130" height="130" fill="#1d1e70"/>
+  <text x="25" y="35" font-family="sans-serif" font-size="7" fill="#ffffff" font-weight="bold">A PROJECT GUIDE TO</text>
+  <text x="25" y="70" font-family="sans-serif" font-size="28" font-weight="900" fill="#ffffff">UX</text>
+  <text x="25" y="105" font-family="sans-serif" font-size="20" font-weight="bold" fill="#ffffff">DESIGN</text>
+  <text x="80" y="170" font-family="sans-serif" font-size="8" fill="#555555" text-anchor="middle">For user experience designers</text>
+  <text x="80" y="185" font-family="sans-serif" font-size="8" fill="#555555" text-anchor="middle">in the field or in the making</text>
+</svg>

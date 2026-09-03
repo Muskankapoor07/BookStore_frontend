@@ -64,7 +64,7 @@ export class Login implements OnInit {
   onLogin() {
     if (this.loginForm.valid) {
       console.log('Login:', this.loginForm.value);
-      // TODO: connect to backend API
+      this.router.navigate(['/dashboard']);
     } else {
       this.loginForm.markAllAsTouched();
     }
@@ -73,7 +73,7 @@ export class Login implements OnInit {
   onSignup() {
     if (this.signupForm.valid) {
       console.log('Signup:', this.signupForm.value);
-      // TODO: connect to backend API
+      this.router.navigate(['/dashboard']);
     } else {
       this.signupForm.markAllAsTouched();
     }
