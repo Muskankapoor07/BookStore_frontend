@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -17,20 +20,26 @@ export class Login implements OnInit {
   loginForm: FormGroup;
   signupForm: FormGroup;
 
+  isLoading = false;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberMe: [false],
     });
 
     this.signupForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
     });
   }
@@ -51,6 +60,7 @@ export class Login implements OnInit {
 
   switchTab(tab: 'login' | 'signup') {
     this.activeTab = tab;
+    this.cdr.detectChanges();
   }
 
   toggleLoginPassword() {
@@ -62,20 +72,96 @@ export class Login implements OnInit {
   }
 
   onLogin() {
-    if (this.loginForm.valid) {
-      console.log('Login:', this.loginForm.value);
-      this.router.navigate(['/dashboard']);
-    } else {
+    this.notificationService.clear();
+
+    if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
+      this.notificationService.showError('Please enter a valid email and password.', 3000);
+      return;
     }
+
+    this.isLoading = true;
+    const { email, password, rememberMe } = this.loginForm.value;
+
+    this.authService.login({ email, password, rememberMe })
+      .pipe(finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (res) => {
+          // Show login success popup
+          this.notificationService.showSuccess('Logged in successfully!', 2500);
+          this.cdr.detectChanges();
+
+          // Wait 1.2s then navigate to home & clear popup
+          setTimeout(() => {
+            this.notificationService.clear();
+            this.router.navigate(['/home']);
+          }, 1200);
+        },
+        error: (err) => {
+          let msg = 'Invalid email or password.';
+          if (err.status === 0) {
+            msg = 'Backend server is not running on http://localhost:8080. Please start Spring Boot.';
+          } else if (err.error) {
+            if (typeof err.error === 'string') {
+              msg = err.error;
+            } else if (err.error.message) {
+              msg = err.error.message;
+            }
+          }
+          this.notificationService.showError(msg, 3500);
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   onSignup() {
-    if (this.signupForm.valid) {
-      console.log('Signup:', this.signupForm.value);
-      this.router.navigate(['/dashboard']);
-    } else {
+    this.notificationService.clear();
+
+    if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
+      this.notificationService.showError('Please fill in all required fields correctly.', 3000);
+      return;
     }
+
+    this.isLoading = true;
+    const { fullName, email, password } = this.signupForm.value;
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName;
+
+    this.authService.register({ firstName, lastName, email, password })
+      .pipe(finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (res) => {
+          this.signupForm.reset();
+
+          // 1. Immediately switch to LOGIN tab
+          this.activeTab = 'login';
+
+          // 2. Show success popup
+          this.notificationService.showSuccess('Account created successfully! Please login.', 3500);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          let msg = 'Registration failed. Please try again.';
+          if (err.status === 0) {
+            msg = 'Backend server is not running on http://localhost:8080. Please start Spring Boot.';
+          } else if (err.error) {
+            if (typeof err.error === 'string') {
+              msg = err.error;
+            } else if (err.error.message) {
+              msg = err.error.message;
+            }
+          }
+          this.notificationService.showError(msg, 3500);
+          this.cdr.detectChanges();
+        },
+      });
   }
 }

@@ -1,1 +1,13 @@
+<!-- Global Floating Top Pop-up Notification (Auto-dismisses, Guaranteed Change Detection via AsyncPipe) -->
+<ng-container *ngIf="notificationService.notification$ | async as notification">
+  <div id="global-top-notification"
+       style="position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 0.85rem; box-shadow: 0 4px 20px rgba(0,0,0,0.25); width: auto; max-width: 90vw; transition: all 0.3s ease;"
+       [style.background-color]="notification.type === 'success' ? '#def7ec' : '#fde8e8'"
+       [style.color]="notification.type === 'success' ? '#03543f' : '#c81e1e'"
+       [style.border]="notification.type === 'success' ? '1px solid #84e1bc' : '1px solid #f8b4b4'">
+    <span>{{ notification.message }}</span>
+    <button type="button" (click)="clearNotification()" style="background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0 2px;" [style.color]="notification.type === 'success' ? '#03543f' : '#c81e1e'">&times;</button>
+  </div>
+</ng-container>
+
 <router-outlet />
