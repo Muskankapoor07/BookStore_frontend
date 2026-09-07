@@ -84,23 +84,19 @@ export class Login implements OnInit {
     const { email, password, rememberMe } = this.loginForm.value;
 
     this.authService.login({ email, password, rememberMe })
-      .pipe(finalize(() => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }))
       .subscribe({
         next: (res) => {
-          // Show login success popup
-          this.notificationService.showSuccess('Logged in successfully!', 2500);
+          // Show green banner 'Login Successful' that persists across route navigation
+          this.notificationService.showSuccess('Login Successful', 3500);
           this.cdr.detectChanges();
 
-          // Wait 1.2s then navigate to home & clear popup
+          // Navigate to home after short delay without clearing notification
           setTimeout(() => {
-            this.notificationService.clear();
             this.router.navigate(['/home']);
-          }, 1200);
+          }, 300);
         },
         error: (err) => {
+          this.isLoading = false;
           let msg = 'Invalid email or password.';
           if (err.status === 0) {
             msg = 'Backend server is not running on http://localhost:8080. Please start Spring Boot.';

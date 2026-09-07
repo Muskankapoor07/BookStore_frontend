@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-navbar',
@@ -24,6 +25,7 @@ export class NavbarComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private cartService: CartService,
+    private notificationService: NotificationService,
     private router: Router
   ) {}
 
@@ -61,6 +63,7 @@ export class NavbarComponent implements OnInit {
   logout(): void {
     this.isProfileMenuOpen = false;
     this.authService.logout();
+    this.notificationService.showSuccess('Logged out successfully!', 2500);
     this.router.navigate(['/login']);
   }
 }

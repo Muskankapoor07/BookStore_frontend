@@ -77,7 +77,8 @@
       </div>
 
       <button type="submit" class="submit-btn" [disabled]="isLoading" id="login-submit-btn">
-        {{ isLoading ? 'Logging in...' : 'Login' }}
+        <span *ngIf="isLoading" class="btn-spinner"></span>
+        <span>Login</span>
       </button>
 
       <div class="divider-line">
@@ -162,7 +163,8 @@
       </div>
 
       <button type="submit" class="submit-btn" [disabled]="isLoading" id="signup-submit-btn">
-        {{ isLoading ? 'Creating Account...' : 'Signup' }}
+        <span *ngIf="isLoading" class="btn-spinner"></span>
+        <span>{{ isLoading ? 'Creating Account...' : 'Signup' }}</span>
       </button>
     </form>
   </div>
