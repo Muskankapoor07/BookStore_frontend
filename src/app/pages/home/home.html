@@ -31,7 +31,6 @@
         class="book-card"
         *ngFor="let book of filteredBooksList"
         [class.out-of-stock]="book.isOutOfStock"
-        (click)="addToCart(book)"
       >
         <!-- Book Cover Box -->
         <div class="cover-wrapper">
@@ -48,12 +47,14 @@
           <h2 class="book-title">{{ book.title }}</h2>
           <p class="book-author">{{ book.author }}</p>
 
-          <!-- Rating -->
+          <!-- Rating & Quantity -->
           <div class="rating-row">
             <span class="rating-badge">
               {{ book.rating }} ★
             </span>
-            <span class="rating-count">({{ book.ratingCount }})</span>
+            <span class="stock-quantity" *ngIf="book.quantity !== undefined">
+              ({{ book.quantity }})
+            </span>
           </div>
 
           <!-- Price -->
@@ -65,8 +66,14 @@
       </div>
     </div>
 
-    <!-- Pagination Section (Only when books exist) -->
-    <div class="pagination-wrapper" *ngIf="filteredBooksList.length > 0">
+    <!-- Empty Database State -->
+    <div class="no-books-container" *ngIf="filteredBooksList.length === 0 && !isLoading" style="text-align: center; padding: 3rem 1rem; color: #666;">
+      <h3 style="font-size: 1.1rem; color: #444;">No books found in database</h3>
+      <p style="font-size: 0.85rem; color: #888; margin-top: 0.4rem;">Please add books to your database or try searching with a different keyword.</p>
+    </div>
+
+    <!-- Pagination Section (Only displayed when there are multiple pages) -->
+    <div class="pagination-wrapper" *ngIf="totalPages > 1 && filteredBooksList.length > 0">
       <button
         class="page-nav-btn"
         [disabled]="currentPage === 1"
@@ -75,21 +82,18 @@
         ‹
       </button>
 
-      <ng-container *ngFor="let page of pages">
-        <button
-          *ngIf="page !== 18 || pages.indexOf(page) === pages.length - 1"
-          class="page-num-btn"
-          [class.active]="currentPage === page"
-          (click)="setPage(page)"
-        >
-          {{ page }}
-        </button>
-        <span *ngIf="page === 8" class="page-dots">...</span>
-      </ng-container>
+      <button
+        *ngFor="let page of pages"
+        class="page-num-btn"
+        [class.active]="currentPage === page"
+        (click)="setPage(page)"
+      >
+        {{ page }}
+      </button>
 
       <button
         class="page-nav-btn"
-        [disabled]="currentPage === 18"
+        [disabled]="currentPage === totalPages"
         (click)="setPage(currentPage + 1)"
       >
         ›

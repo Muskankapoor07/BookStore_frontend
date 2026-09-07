@@ -322,9 +322,11 @@
   border-radius: 2px;
 }
 
-.rating-count {
-  font-size: 0.7rem;
-  color: #878787;
+.rating-count,
+.stock-quantity {
+  font-size: 0.72rem;
+  color: #666666;
+  font-weight: 500;
 }
 
 /* Price Row */

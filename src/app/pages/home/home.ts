@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Book } from '../../models/book.model';
 import { BookService } from '../../services/book.service';
 import { CartService } from '../../services/cart.service';
+import { NotificationService } from '../../services/notification.service';
 import { NavbarComponent } from '../../components/navbar/navbar';
 
 @Component({
@@ -25,11 +26,14 @@ export class Home implements OnInit {
   totalItems: number = 0;
   currentYear: number = new Date().getFullYear();
 
-  pages: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 18];
+  totalPages: number = 1;
+  pages: number[] = [];
 
   constructor(
     private bookService: BookService,
-    private cartService: CartService
+    private cartService: CartService,
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -37,19 +41,21 @@ export class Home implements OnInit {
   }
 
   /**
-   * Load books dynamically via BookService (connected to Backend API)
+   * Load books dynamically via BookService (connected to Spring Boot Backend API)
    */
   loadBooks(): void {
     this.isLoading = true;
-    this.bookService.getBooks(this.searchQuery, this.sortBy).subscribe({
+    this.bookService.getBooks(this.searchQuery, this.sortBy, this.currentPage - 1, this.pageSize).subscribe({
       next: (data: Book[]) => {
         this.books = data || [];
         this.applyFilterAndSort();
         this.isLoading = false;
+        this.cdr.detectChanges(); // Trigger instant view update as soon as books load
       },
       error: (err) => {
-        console.error('Error fetching books:', err);
+        console.error('Error fetching books from backend:', err);
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
     });
   }
@@ -78,28 +84,36 @@ export class Home implements OnInit {
 
     this.filteredBooksList = result;
     this.totalItems = this.filteredBooksList.length;
+    this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
   onSearchChange(query: string): void {
     this.searchQuery = query;
     this.currentPage = 1;
-    this.applyFilterAndSort();
+    this.loadBooks();
   }
 
   onSortChange(): void {
     this.currentPage = 1;
-    this.applyFilterAndSort();
+    this.loadBooks();
   }
 
   setPage(page: number): void {
-    if (page >= 1 && page <= 18) {
+    if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      this.loadBooks();
     }
   }
 
-  addToCart(book: Book): void {
+  addToCart(book: Book, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
     if (!book.isOutOfStock) {
       this.cartService.addToCart(book);
+      this.notificationService.showSuccess(`"${book.title}" added to cart!`, 2000);
+      this.cdr.detectChanges();
     }
   }
 }
