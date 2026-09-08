@@ -10,7 +10,7 @@ export const routes: Routes = [
   { path: 'signup', component: Login },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'home', component: Home },
-  { path: 'dashboard', component: Home },
+  { path: 'dashboard', redirectTo: 'home', pathMatch: 'full' },
   { path: 'book/:id', component: BookDetails },
 ];
 

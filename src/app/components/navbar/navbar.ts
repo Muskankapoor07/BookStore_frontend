@@ -64,6 +64,6 @@ export class NavbarComponent implements OnInit {
     this.isProfileMenuOpen = false;
     this.authService.logout();
     this.notificationService.showSuccess('Logged out successfully!', 2500);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 }

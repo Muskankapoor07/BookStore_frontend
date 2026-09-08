@@ -206,19 +206,22 @@
 /* Cover Wrapper */
 .cover-wrapper {
   background-color: #f2f2f2;
-  height: 140px;
+  height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.6rem;
   position: relative;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .book-cover {
-  max-height: 115px;
-  max-width: 90px;
-  object-fit: contain;
+  width: 95px !important;
+  height: 130px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 2px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
