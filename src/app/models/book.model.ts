@@ -9,6 +9,16 @@ export interface Book {
   coverImage?: string;
   isOutOfStock?: boolean;
   quantity?: number;
+  description?: string;
+}
+
+export interface FeedbackItem {
+  id?: number;
+  productId?: number;
+  userEmail?: string;
+  userName?: string;
+  rating: number;
+  comment: string;
 }
 
 export interface BookResponse {
@@ -17,3 +27,4 @@ export interface BookResponse {
   currentPage: number;
   totalPages: number;
 }
+

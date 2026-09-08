@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Book } from '../../models/book.model';
 import { BookService } from '../../services/book.service';
 import { CartService } from '../../services/cart.service';
@@ -33,6 +34,7 @@ export class Home implements OnInit {
     private bookService: BookService,
     private cartService: CartService,
     private notificationService: NotificationService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -106,6 +108,10 @@ export class Home implements OnInit {
     }
   }
 
+  openBookDetail(bookId: number | string): void {
+    this.router.navigate(['/book', bookId]);
+  }
+
   addToCart(book: Book, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
@@ -117,3 +123,4 @@ export class Home implements OnInit {
     }
   }
 }
+

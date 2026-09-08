@@ -1,0 +1,177 @@
+<div class="book-details-page">
+  <!-- Navbar Header -->
+  <app-navbar
+    [(searchQuery)]="searchQuery"
+    (search)="onSearch($event)"
+  ></app-navbar>
+
+  <!-- Main Container -->
+  <main class="page-container" *ngIf="!isLoading && book">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb-nav">
+      <a routerLink="/home" class="breadcrumb-link">Home</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">
+        Book({{ (book.id | number:'2.0-0') || book.id }})
+      </span>
+    </nav>
+
+    <!-- Content Grid -->
+    <div class="details-grid">
+      <!-- Left Column: Image Gallery & Action Buttons -->
+      <div class="left-column">
+        <div class="gallery-wrapper">
+          <!-- Thumbnails Vertical Bar -->
+          <div class="thumbnails-bar" *ngIf="thumbnails.length > 0">
+            <div
+              *ngFor="let img of thumbnails"
+              class="thumb-box"
+              [class.active]="img === selectedImage"
+              (click)="selectThumbnail(img)"
+            >
+              <img [src]="img" [alt]="book.title" />
+            </div>
+          </div>
+
+          <!-- Main Image Display Container -->
+          <div class="main-image-container">
+            <img [src]="selectedImage" [alt]="book.title" class="main-cover-img" />
+          </div>
+        </div>
+
+        <!-- Action Buttons Row -->
+        <div class="action-buttons-row">
+          <button
+            class="btn-add-bag"
+            [disabled]="book.isOutOfStock"
+            (click)="addToBag()"
+          >
+            ADD TO BAG
+          </button>
+
+          <button class="btn-wishlist" (click)="addToWishlist()">
+            <span class="heart-icon">♥</span> WISHLIST
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Column: Book Info & Customer Feedback -->
+      <div class="right-column">
+        <!-- Title & Author -->
+        <h1 class="book-title">{{ book.title }}</h1>
+        <p class="book-author">by {{ book.author }}</p>
+
+        <!-- Rating Badge & Count -->
+        <div class="rating-row">
+          <span class="rating-badge">
+            {{ book.rating }} ★
+          </span>
+          <span class="rating-count">
+            ({{ book.ratingCount }})
+          </span>
+        </div>
+
+        <!-- Price Section -->
+        <div class="price-row">
+          <span class="discount-price">Rs.{{ book.discountPrice }}</span>
+          <span class="original-price">Rs.{{ book.originalPrice }}</span>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Book Detail Description -->
+        <div class="book-detail-box">
+          <h3 class="section-header">• Book Detail</h3>
+          <p class="description-text">
+            {{ book.description }}
+          </p>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Customer Feedback Section -->
+        <div class="feedback-section">
+          <h2 class="feedback-title">Customer Feedback</h2>
+
+          <!-- Rating & Review Form Box -->
+          <div class="feedback-form-box">
+            <p class="overall-rating-label">Overall rating</p>
+
+            <!-- Star Rating Input -->
+            <div class="star-picker">
+              <span
+                *ngFor="let star of [1, 2, 3, 4, 5]"
+                class="star-btn"
+                [class.filled]="star <= (hoverRating || userRating)"
+                (mouseenter)="setHoverRating(star)"
+                (mouseleave)="setHoverRating(0)"
+                (click)="setRating(star)"
+              >
+                ★
+              </span>
+            </div>
+
+            <!-- Review Input Textarea -->
+            <textarea
+              class="review-textarea"
+              rows="3"
+              placeholder="Write your review"
+              [(ngModel)]="newComment"
+            ></textarea>
+
+            <!-- Submit Button Row -->
+            <div class="submit-btn-row">
+              <button
+                class="btn-submit-review"
+                [disabled]="isSubmittingFeedback"
+                (click)="submitFeedback()"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+
+          <!-- Customer Reviews List -->
+          <div class="reviews-list">
+            <div class="review-card" *ngFor="let fb of feedbackList">
+              <div class="user-avatar">
+                {{ getUserInitials(fb.userEmail) }}
+              </div>
+              <div class="review-body">
+                <div class="reviewer-name">
+                  {{ getUserDisplayName(fb.userEmail) }}
+                </div>
+                <div class="reviewer-stars">
+                  <span
+                    *ngFor="let star of [1, 2, 3, 4, 5]"
+                    class="star-icon"
+                    [class.active]="star <= fb.rating"
+                  >
+                    ★
+                  </span>
+                </div>
+                <p class="review-comment">
+                  {{ fb.comment }}
+                </p>
+              </div>
+            </div>
+
+            <div class="no-reviews" *ngIf="feedbackList.length === 0">
+              <p>No customer reviews yet. Be the first to review this book!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <p>Loading book details...</p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Copyright © {{ currentYear }}, Bookstore Private Limited. All Rights Reserved</p>
+  </footer>
+</div>

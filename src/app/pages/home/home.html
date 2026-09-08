@@ -31,6 +31,7 @@
         class="book-card"
         *ngFor="let book of filteredBooksList"
         [class.out-of-stock]="book.isOutOfStock"
+        (click)="openBookDetail(book.id)"
       >
         <!-- Book Cover Box -->
         <div class="cover-wrapper">

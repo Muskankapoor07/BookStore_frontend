@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Book } from '../models/book.model';
+import { Book, FeedbackItem } from '../models/book.model';
 
 @Injectable({
   providedIn: 'root',
@@ -71,6 +71,39 @@ export class BookService {
     );
   }
 
+  /**
+   * Fetch customer feedback/reviews for a product from backend database
+   */
+  getFeedback(productId: number | string): Observable<FeedbackItem[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/get/feedback/${productId}`).pipe(
+      map((list) =>
+        (list || []).map((fb) => ({
+          id: fb.id,
+          productId: fb.productId,
+          userEmail: fb.userEmail,
+          userName: fb.userEmail ? fb.userEmail.split('@')[0] : 'Anonymous',
+          rating: fb.rating ?? 5,
+          comment: fb.comment || '',
+        }))
+      ),
+      catchError(() => of([]))
+    );
+  }
+
+  /**
+   * Post customer feedback/review for a product to backend database
+   */
+  addFeedback(
+    productId: number | string,
+    rating: number,
+    comment: string
+  ): Observable<FeedbackItem> {
+    return this.http.post<FeedbackItem>(
+      `${this.baseUrl}/add/feedback/${productId}`,
+      { rating, comment }
+    );
+  }
+
   private mapProductToBook(product: any, index: number = 0): Book {
     const defaultImages = [
       'assets/images/dont-make-me-think.svg',
@@ -93,13 +126,17 @@ export class BookService {
       id: product.id,
       title: product.name || product.title || 'Untitled Book',
       author: product.author || 'Unknown Author',
-      rating: product.rating ?? 0,
-      ratingCount: product.ratingCount ?? 0,
+      rating: product.rating ?? 4.5,
+      ratingCount: product.ratingCount ?? 20,
       discountPrice: product.discountPrice ?? product.price ?? 0,
       originalPrice: product.price ?? product.discountPrice ?? 0,
       coverImage: product.imageUrl || fallbackImg,
       isOutOfStock: isOutOfStock,
       quantity: product.quantity ?? 0,
+      description:
+        product.description ||
+        'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut',
     };
   }
 }
+
