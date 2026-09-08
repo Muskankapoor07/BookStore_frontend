@@ -31,7 +31,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user) => {
-      this.currentUser = user;
+      this.currentUser = this.authService.isLoggedIn() ? user : null;
     });
 
     this.cartService.cartCount$.subscribe((count) => {

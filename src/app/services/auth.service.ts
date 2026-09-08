@@ -27,14 +27,17 @@ export class AuthService {
   }
 
   private loadUserFromStorage(): void {
+    const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
-    if (savedUser) {
+    if (token && savedUser) {
       try {
         this.currentUserSubject.next(JSON.parse(savedUser));
       } catch (e) {
         console.error('Error parsing stored user:', e);
         this.logout();
       }
+    } else {
+      this.logout();
     }
   }
 
