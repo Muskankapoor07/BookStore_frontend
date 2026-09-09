@@ -139,14 +139,35 @@ export class BookDetails implements OnInit {
     });
   }
 
+  getCartQuantity(): number {
+    return this.book ? this.cartService.getCartItemQuantity(this.book.id) : 0;
+  }
+
   addToBag(): void {
+    this.increaseQuantity();
+  }
+
+  increaseQuantity(): void {
     if (this.book) {
-      if (this.book.isOutOfStock) {
+      if (this.book.isOutOfStock || (this.book.quantity !== undefined && this.book.quantity <= 0)) {
         this.notificationService.showError('This book is currently out of stock.', 2500);
         return;
       }
-      this.cartService.addToCart(this.book);
-      this.notificationService.showSuccess(`"${this.book.title}" added to bag!`, 2000);
+      const currentQty = this.getCartQuantity();
+      if (this.book.quantity !== undefined && this.book.quantity > 0 && currentQty >= this.book.quantity) {
+        this.notificationService.showError(`Only ${this.book.quantity} items available in stock!`, 2500);
+        return;
+      }
+      this.cartService.incrementQuantity(this.book);
+      if (currentQty === 0) {
+        this.notificationService.showSuccess(`"${this.book.title}" added to bag!`, 2000);
+      }
+    }
+  }
+
+  decreaseQuantity(): void {
+    if (this.book) {
+      this.cartService.decrementQuantity(this.book.id);
     }
   }
 

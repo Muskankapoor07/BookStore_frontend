@@ -158,6 +158,75 @@
   transition: background-color 0.2s ease;
 }
 
+.btn-add-bag:hover {
+  background-color: #80242a;
+}
+
+/* Quantity Stepper Control (Image 2 style) */
+.quantity-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  height: 38px;
+}
+
+.btn-qty-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #dbdbdb;
+  background-color: #fafafa;
+  color: #333333;
+  font-size: 1.1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  user-select: none;
+}
+
+.btn-qty-circle:hover:not(:disabled) {
+  background-color: #eeeeee;
+  border-color: #a03037;
+  color: #a03037;
+}
+
+.btn-qty-circle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qty-display-box {
+  width: 55px;
+  height: 32px;
+  border: 1px solid #dbdbdb;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333333;
+  border-radius: 2px;
+}
+
+.btn-out-of-stock {
+  background-color: #878787;
+  color: #ffffff;
+  border: none;
+  border-radius: 2px;
+  padding: 0.7rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  cursor: not-allowed;
+}
+
 .btn-add-bag:hover:not(:disabled) {
   background-color: #80242a;
 }

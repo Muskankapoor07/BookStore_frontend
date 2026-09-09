@@ -41,9 +41,35 @@
 
         <!-- Action Buttons Row -->
         <div class="action-buttons-row">
+          <!-- Out of Stock State -->
           <button
+            *ngIf="book.isOutOfStock || (book.quantity !== undefined && book.quantity <= 0)"
+            class="btn-out-of-stock"
+            disabled
+          >
+            OUT OF STOCK
+          </button>
+
+          <!-- Stepper Quantity Controls when in cart -->
+          <div
+            *ngIf="!book.isOutOfStock && (book.quantity === undefined || book.quantity > 0) && getCartQuantity() > 0"
+            class="quantity-stepper"
+          >
+            <button class="btn-qty-circle" (click)="decreaseQuantity()">-</button>
+            <span class="qty-display-box">{{ getCartQuantity() }}</span>
+            <button
+              class="btn-qty-circle"
+              [disabled]="book.quantity !== undefined && book.quantity > 0 && getCartQuantity() >= book.quantity"
+              (click)="increaseQuantity()"
+            >
+              +
+            </button>
+          </div>
+
+          <!-- Default Add to Bag Button -->
+          <button
+            *ngIf="!book.isOutOfStock && (book.quantity === undefined || book.quantity > 0) && getCartQuantity() === 0"
             class="btn-add-bag"
-            [disabled]="book.isOutOfStock"
             (click)="addToBag()"
           >
             ADD TO BAG
