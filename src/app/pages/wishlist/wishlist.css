@@ -1,0 +1,273 @@
+.wishlist-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  color: #0a0102;
+  font-family: Roboto, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.page-container {
+  flex: 1;
+  max-width: 950px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Guest Login Prompt Container (Image 2 design) */
+.login-prompt-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+  min-height: 420px;
+}
+
+.prompt-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0a0102;
+  letter-spacing: 0.8px;
+  margin: 0 0 0.4rem 0;
+}
+
+.prompt-sub {
+  font-size: 0.85rem;
+  color: #9d9d9d;
+  margin: 0 0 2rem 0;
+}
+
+.heart-icon-wrapper {
+  margin-bottom: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-login-signup {
+  border: 1px solid #A03037;
+  color: #A03037;
+  background-color: #ffffff;
+  padding: 0.6rem 1.8rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 2px;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.btn-login-signup:hover {
+  background-color: #fdf2f2;
+}
+
+/* Logged-In Wishlist Container */
+.wishlist-container {
+  width: 100%;
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  color: #707070;
+}
+
+.breadcrumb-link {
+  color: #878787;
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+  color: #a03037;
+}
+
+.breadcrumb-separator {
+  color: #9d9d9d;
+}
+
+.breadcrumb-current {
+  color: #0a0102;
+  font-weight: 600;
+}
+
+.wishlist-card {
+  border: 1px solid #e4e4e4;
+  border-radius: 2px;
+  background-color: #ffffff;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  border-bottom: 1px solid #eeeeee;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0a0102;
+  margin: 0;
+}
+
+.wishlist-items-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wishlist-item-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.2rem 0;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.wishlist-item-row:last-child {
+  border-bottom: none;
+}
+
+.item-cover-wrapper {
+  width: 75px;
+  height: 95px;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  flex-shrink: 0;
+}
+
+.item-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0a0102;
+  margin: 0 0 0.2rem 0;
+}
+
+.item-author {
+  font-size: 0.8rem;
+  color: #9d9d9d;
+  margin: 0 0 0.5rem 0;
+}
+
+.item-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.discount-price {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0a0102;
+}
+
+.original-price {
+  font-size: 0.8rem;
+  color: #9d9d9d;
+  text-decoration: line-through;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-add-bag {
+  background-color: #a03037;
+  color: #ffffff;
+  border: none;
+  border-radius: 2px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  transition: background-color 0.2s ease;
+}
+
+.btn-add-bag:hover {
+  background-color: #80242a;
+}
+
+.btn-trash {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #999999;
+  transition: color 0.2s ease;
+  padding: 0.3rem;
+}
+
+.btn-trash:hover {
+  color: #a03037;
+}
+
+.empty-wishlist-box {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.empty-sub {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 0.4rem;
+}
+
+.btn-primary-red {
+  background-color: #a03037;
+  color: #ffffff;
+  border: none;
+  border-radius: 2px;
+  padding: 0.65rem 1.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Footer */
+.app-footer {
+  background-color: #2e1d1e;
+  color: #ffffff;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.75rem;
+  margin-top: auto;
+}
