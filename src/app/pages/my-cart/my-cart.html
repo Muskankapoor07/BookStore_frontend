@@ -1,0 +1,218 @@
+<div class="my-cart-page">
+  <!-- Navbar Header -->
+  <app-navbar
+    [(searchQuery)]="searchQuery"
+    (search)="onSearch($event)"
+  ></app-navbar>
+
+  <!-- Main Container -->
+  <main class="page-container">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb-nav">
+      <a routerLink="/home" class="breadcrumb-link">Home</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">My cart</span>
+    </nav>
+
+    <!-- Cart Flow Layout -->
+    <div class="cart-layout">
+
+      <!-- Section 1: My Cart -->
+      <div class="cart-card">
+        <div class="cart-card-header">
+          <h2 class="card-title">My cart ({{ cartItems.length }})</h2>
+          
+          <!-- Location Dropdown Selector -->
+          <div class="location-selector" *ngIf="cartItems.length > 0">
+            <span class="location-icon">📍</span>
+            <select [(ngModel)]="selectedLocation" class="location-select">
+              <option value="BridgeLabz Solutions LLP, No...">BridgeLabz Solutions LLP, No...</option>
+              <option value="Home Address">Home Address</option>
+              <option value="Workplace Address">Workplace Address</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cart Items List -->
+        <div class="cart-items-list" *ngIf="cartItems.length > 0">
+          <div class="cart-item-row" *ngFor="let item of cartItems">
+            <!-- Book Cover Thumbnail -->
+            <div class="item-cover-wrapper">
+              <img [src]="item.book.coverImage" [alt]="item.book.title" class="item-cover-img" />
+            </div>
+
+            <!-- Book Info & Quantity Controls -->
+            <div class="item-details">
+              <h3 class="item-title">{{ item.book.title }}</h3>
+              <p class="item-author">by {{ item.book.author }}</p>
+
+              <div class="item-price-row">
+                <span class="discount-price">Rs. {{ item.book.discountPrice }}</span>
+                <span class="original-price" *ngIf="item.book.originalPrice > item.book.discountPrice">
+                  Rs. {{ item.book.originalPrice }}
+                </span>
+              </div>
+
+              <!-- Quantity Stepper Controls -->
+              <div class="item-action-row">
+                <div class="stepper-box">
+                  <button class="btn-step" (click)="decreaseQuantity(item)">-</button>
+                  <span class="qty-num">{{ item.quantity }}</span>
+                  <button
+                    class="btn-step"
+                    [disabled]="item.book.quantity !== undefined && item.book.quantity > 0 && item.quantity >= item.book.quantity"
+                    (click)="increaseQuantity(item)"
+                  >
+                    +
+                  </button>
+                </div>
+                <button class="btn-remove" (click)="removeItem(item)">Remove</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Place Order Button Row -->
+          <div class="place-order-row" *ngIf="step === 1">
+            <button class="btn-primary-blue" (click)="goToAddressStep()">
+              PLACE ORDER
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty Cart State -->
+        <div class="empty-cart-box" *ngIf="cartItems.length === 0 && !isOrderPlaced">
+          <p class="empty-title">Your cart is currently empty</p>
+          <p class="empty-sub">Explore our collection and add your favorite books!</p>
+          <button routerLink="/home" class="btn-primary-blue" style="margin-top: 1rem;">
+            CONTINUE SHOPPING
+          </button>
+        </div>
+
+        <!-- Order Success State -->
+        <div class="empty-cart-box" *ngIf="isOrderPlaced">
+          <div style="font-size: 3rem; color: #2e7d32; margin-bottom: 0.5rem;">✔</div>
+          <h2 style="color: #2e7d32; font-size: 1.4rem;">Order Placed Successfully!</h2>
+          <p style="color: #666; margin-top: 0.5rem; font-size: 0.9rem;">
+            Thank you for shopping with Bookstore. Your order is being processed.
+          </p>
+          <button routerLink="/home" class="btn-primary-blue" style="margin-top: 1.2rem;">
+            CONTINUE SHOPPING
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 2: Address Details -->
+      <div class="cart-card accordion-card" [class.collapsed]="step < 2">
+        <div class="accordion-header" (click)="step >= 2 ? (step = (step === 2 ? 1 : 2)) : null">
+          <h2 class="card-title">Address Details</h2>
+        </div>
+
+        <div class="accordion-body" *ngIf="step >= 2 && !isOrderPlaced">
+          <div class="address-form">
+            <div class="form-row-two">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" [(ngModel)]="address.fullName" placeholder="Enter your full name" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="text" [(ngModel)]="address.mobileNumber" placeholder="Enter 10-digit mobile number" class="form-input" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Address</label>
+              <textarea [(ngModel)]="address.address" rows="3" placeholder="Enter complete flat / house no, street, locality" class="form-textarea"></textarea>
+            </div>
+
+            <div class="form-row-two">
+              <div class="form-group">
+                <label>City / Town</label>
+                <input type="text" [(ngModel)]="address.city" placeholder="City" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>State</label>
+                <input type="text" [(ngModel)]="address.state" placeholder="State" class="form-input" />
+              </div>
+            </div>
+
+            <!-- Address Type Radio -->
+            <div class="type-radio-group">
+              <label class="type-label">Type:</label>
+              <label class="radio-item">
+                <input type="radio" name="addressType" value="Home" [(ngModel)]="address.type" /> Home
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="addressType" value="Work" [(ngModel)]="address.type" /> Work
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="addressType" value="Other" [(ngModel)]="address.type" /> Other
+              </label>
+            </div>
+
+            <div class="place-order-row" *ngIf="step === 2">
+              <button class="btn-primary-blue" (click)="goToOrderSummary()">
+                CONTINUE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Order summary -->
+      <div class="cart-card accordion-card" [class.collapsed]="step < 3">
+        <div class="accordion-header" (click)="step >= 3 ? (step = (step === 3 ? 2 : 3)) : null">
+          <h2 class="card-title">Order summary</h2>
+        </div>
+
+        <div class="accordion-body" *ngIf="step >= 3 && !isOrderPlaced">
+          <div class="order-summary-list">
+            <div class="summary-item-row" *ngFor="let item of cartItems">
+              <img [src]="item.book.coverImage" [alt]="item.book.title" class="summary-item-img" />
+              <div class="summary-item-info">
+                <h4 class="summary-title">{{ item.book.title }}</h4>
+                <p class="summary-author">by {{ item.book.author }}</p>
+                <p class="summary-price">
+                  Rs. {{ item.book.discountPrice }} × {{ item.quantity }} = <strong>Rs. {{ item.book.discountPrice * item.quantity }}</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Calculation Box -->
+          <div class="total-calculation-box">
+            <div class="calc-row">
+              <span>Total Price:</span>
+              <span>Rs. {{ getOriginalTotalPrice() }}</span>
+            </div>
+            <div class="calc-row discount-row" *ngIf="getTotalDiscount() > 0">
+              <span>Discount:</span>
+              <span>- Rs. {{ getTotalDiscount() }}</span>
+            </div>
+            <div class="calc-row">
+              <span>Delivery Charges:</span>
+              <span class="free-text">FREE</span>
+            </div>
+            <hr />
+            <div class="calc-row final-row">
+              <span>Total Payable Amount:</span>
+              <span>Rs. {{ getTotalPrice() }}</span>
+            </div>
+          </div>
+
+          <div class="place-order-row">
+            <button class="btn-primary-blue" [disabled]="isPlacingOrder" (click)="checkoutOrder()">
+              {{ isPlacingOrder ? 'CHECKING OUT...' : 'CHECKOUT' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Copyright © {{ currentYear }}, Bookstore Private Limited. All Rights Reserved</p>
+  </footer>
+</div>

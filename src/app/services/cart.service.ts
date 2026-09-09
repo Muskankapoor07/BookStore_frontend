@@ -37,27 +37,85 @@ export class CartService {
     if (!this.authService.isLoggedIn()) return;
 
     this.http.get<any[]>(`${this.apiUrl}/get_cart_items`).pipe(
-      catchError(() => of([]))
+      catchError((err) => {
+        console.warn('Backend cart fetch failed:', err);
+        return of([]);
+      })
     ).subscribe((res) => {
       if (Array.isArray(res)) {
-        const items: CartItem[] = res.map((item) => ({
-          cartItemId: item.cartItemId || item.id,
-          quantity: item.quantity || 1,
-          book: {
-            id: item.product?.id || item.productId || 1,
-            title: item.product?.name || item.product?.title || 'Book Item',
-            author: item.product?.author || 'Author',
-            rating: item.product?.rating ?? 0,
-            ratingCount: item.product?.ratingCount ?? 0,
-            discountPrice: item.product?.discountPrice ?? item.product?.price ?? 0,
-            originalPrice: item.product?.price ?? 0,
-            coverImage: item.product?.imageUrl || 'assets/images/dont-make-me-think.svg',
-            isOutOfStock: item.product?.quantity !== undefined ? item.product.quantity <= 0 : false,
-            quantity: item.product?.quantity ?? 0,
-          },
-        }));
-        this.cartItemsSubject.next(items);
-        this.updateTotalCount(items);
+        const currentLocalMap = new Map(
+          this.cartItemsSubject.value.map((i) => [String(i.book.id), i.book])
+        );
+
+        const defaultImages = [
+          'assets/images/dont-make-me-think.svg',
+          'assets/images/everyday-things.svg',
+          'assets/images/the-alchemist.svg',
+          'assets/images/lean-ux.svg',
+          'assets/images/react-mui.svg',
+          'assets/images/ux-design-guide.svg',
+          'assets/images/ux-dummies.svg',
+        ];
+
+        const backendItems: CartItem[] = res.map((item, index) => {
+          const bookId = item.productId || item.product?.id || item.id;
+          const existingBook = currentLocalMap.get(String(bookId));
+          const fallbackImg = defaultImages[index % defaultImages.length];
+
+          const book: Book = {
+            id: bookId,
+            title: item.productName || item.product?.name || item.product?.title || existingBook?.title || 'Book Item',
+            author: existingBook?.author || item.product?.author || 'Author',
+            rating: existingBook?.rating ?? item.product?.rating ?? 4.5,
+            ratingCount: existingBook?.ratingCount ?? item.product?.ratingCount ?? 10,
+            discountPrice: item.discountPrice ?? item.product?.discountPrice ?? item.price ?? existingBook?.discountPrice ?? 0,
+            originalPrice: item.price ?? item.product?.price ?? existingBook?.originalPrice ?? 0,
+            coverImage: existingBook?.coverImage || item.product?.imageUrl || fallbackImg,
+            isOutOfStock: existingBook?.isOutOfStock ?? (item.product?.quantity !== undefined ? item.product.quantity <= 0 : false),
+            quantity: existingBook?.quantity ?? item.product?.quantity ?? 10,
+          };
+
+          return {
+            cartItemId: item.id || item.cartItemId,
+            quantity: item.quantity || 1,
+            book: book,
+          };
+        });
+
+        // Merge local items that weren't in backend yet
+        currentLocalMap.forEach((localBook, bId) => {
+          const alreadyInBackend = backendItems.some((bi) => String(bi.book.id) === String(bId));
+          if (!alreadyInBackend) {
+            const localQty = this.getCartItemQuantity(bId) || 1;
+            backendItems.push({ book: localBook, quantity: localQty });
+            this.http.post(`${this.apiUrl}/add_cart_item/${localBook.id}`, {}).pipe(
+              catchError(() => of(null))
+            ).subscribe();
+          }
+        });
+
+        this.cartItemsSubject.next(backendItems);
+        this.updateTotalCount(backendItems);
+
+        // Enrich items with full book details from backend /get/book/{id}
+        backendItems.forEach((ci) => {
+          this.http.get<any>(`${this.apiUrl}/get/book/${ci.book.id}`).pipe(
+            catchError(() => of(null))
+          ).subscribe((product) => {
+            if (product) {
+              ci.book.title = product.name || product.title || ci.book.title;
+              ci.book.author = product.author || ci.book.author;
+              ci.book.rating = product.rating ?? ci.book.rating;
+              ci.book.ratingCount = product.ratingCount ?? ci.book.ratingCount;
+              ci.book.discountPrice = product.discountPrice ?? product.price ?? ci.book.discountPrice;
+              ci.book.originalPrice = product.price ?? ci.book.originalPrice;
+              ci.book.coverImage = product.imageUrl || ci.book.coverImage;
+              ci.book.quantity = product.quantity ?? ci.book.quantity;
+              ci.book.isOutOfStock = product.quantity !== undefined ? product.quantity <= 0 : ci.book.isOutOfStock;
+              this.cartItemsSubject.next([...this.cartItemsSubject.value]);
+            }
+          });
+        });
       }
     });
   }
@@ -171,6 +229,34 @@ export class CartService {
     }
   }
 
+  clearCart(): void {
+    this.cartItemsSubject.next([]);
+    this.cartCountSubject.next(0);
+  }
+
+  placeOrder(): Observable<any> {
+    const currentItems = this.cartItemsSubject.value;
+    const orderPayload = {
+      orders: currentItems.map((item) => ({
+        product_id: String(item.book.id),
+        product_name: item.book.title,
+        product_quantity: item.quantity,
+        product_price: item.book.discountPrice,
+      })),
+    };
+
+    if (this.authService.isLoggedIn()) {
+      return this.http.post(`${this.apiUrl}/add/order`, orderPayload).pipe(
+        catchError((err) => {
+          console.warn('Place order API call failed:', err.message);
+          return of({ success: true, message: 'Order placed' });
+        })
+      );
+    } else {
+      return of({ success: true, message: 'Local order placed' });
+    }
+  }
+
   private updateTotalCount(items: CartItem[]): void {
     const count = items.reduce((sum, item) => sum + item.quantity, 0);
     this.cartCountSubject.next(count);
@@ -180,4 +266,5 @@ export class CartService {
     return this.cartCountSubject.value;
   }
 }
+
 

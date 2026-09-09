@@ -34,30 +34,60 @@
         </svg>
         <span class="nav-label">{{ currentUser ? currentUser.firstName : 'Profile' }}</span>
 
-        <!-- Logout Dropdown Popup -->
+        <!-- Profile Dropdown Popup -->
         <div class="profile-dropdown" *ngIf="isProfileMenuOpen" (click)="$event.stopPropagation()">
-          <div class="profile-info" *ngIf="currentUser" style="padding: 0.5rem; border-bottom: 1px solid #eee; font-size: 0.8rem; text-align: left;">
-            <div style="font-weight: 600; color: #333;">{{ currentUser.firstName }} {{ currentUser.lastName }}</div>
-            <div style="font-size: 0.7rem; color: #666; word-break: break-all;">{{ currentUser.email }}</div>
+          <div class="dropdown-arrow"></div>
+
+          <!-- Guest View (Not Logged In) -->
+          <div class="welcome-box" *ngIf="!currentUser">
+            <h3 class="welcome-title">Welcome</h3>
+            <p class="welcome-sub">To access account and manage orders</p>
+            <a routerLink="/login" class="btn-login-signup" (click)="isProfileMenuOpen = false">
+              LOGIN/SIGNUP
+            </a>
           </div>
 
-          <button type="button" class="logout-btn" (click)="logout()" *ngIf="currentUser">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Logout
-          </button>
+          <!-- Logged In View -->
+          <div class="welcome-box" *ngIf="currentUser">
+            <h3 class="welcome-title">Hello {{ currentUser.firstName }}</h3>
+            <p class="welcome-sub">{{ currentUser.email }}</p>
+          </div>
 
-          <a routerLink="/login" class="logout-btn" style="text-decoration: none; display: flex; align-items: center; gap: 0.3rem; justify-content: center;" (click)="isProfileMenuOpen = false" *ngIf="!currentUser">
-            Login / Signup
-          </a>
+          <hr class="dropdown-divider" />
+
+          <!-- Menu Options -->
+          <div class="dropdown-links">
+            <a routerLink="/cart" class="dropdown-link-item" (click)="isProfileMenuOpen = false">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              <span>My Orders</span>
+            </a>
+            <a routerLink="/home" class="dropdown-link-item" (click)="isProfileMenuOpen = false">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-svg">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              <span>Wishlist</span>
+            </a>
+          </div>
+
+          <div style="margin-top: 0.6rem;" *ngIf="currentUser">
+            <button type="button" class="logout-btn" (click)="logout()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Cart Button -->
-      <div class="nav-item cart-item" routerLink="/home">
+      <div class="nav-item cart-item" routerLink="/cart">
         <div class="cart-icon-wrapper">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="9" cy="21" r="1"/>
