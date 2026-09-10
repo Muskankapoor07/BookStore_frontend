@@ -215,4 +215,101 @@
   <footer class="app-footer">
     <p>Copyright © {{ currentYear }}, Bookstore Private Limited. All Rights Reserved</p>
   </footer>
+
+  <!-- ================= LOGIN MODAL OVERLAY ================= -->
+  <div class="login-modal-overlay" *ngIf="showLoginModal" (click)="onModalOverlayClick($event)">
+    <div class="login-modal-container">
+
+      <!-- Left Panel - Illustration -->
+      <div class="modal-left-panel">
+        <div class="modal-illustration-wrapper">
+          <img src="assets/images/book-shopping.png" alt="Online Book Shopping" class="modal-illustration" />
+        </div>
+        <h2 class="modal-brand-title">ONLINE BOOK SHOPPING</h2>
+      </div>
+
+      <!-- Right Panel - Login/Signup Form -->
+      <div class="modal-right-panel">
+        <!-- Close Button -->
+        <button class="modal-close-btn" (click)="closeLoginModal()">✕</button>
+
+        <!-- Tab Headers -->
+        <div class="modal-tab-header">
+          <button class="modal-tab-btn" [class.active]="loginModalTab === 'login'" (click)="switchModalTab('login')">LOGIN</button>
+          <button class="modal-tab-btn" [class.active]="loginModalTab === 'signup'" (click)="switchModalTab('signup')">SIGNUP</button>
+        </div>
+
+        <!-- Login Form -->
+        <form *ngIf="loginModalTab === 'login'" [formGroup]="loginForm" (ngSubmit)="onModalLogin()" class="modal-auth-form">
+          <div class="modal-form-group" [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            <label>Email Id</label>
+            <input type="email" formControlName="email" placeholder="Enter your email" />
+            <span class="modal-error-msg" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">Enter a valid email</span>
+          </div>
+
+          <div class="modal-form-group" [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <label>Password</label>
+            <div class="modal-password-wrapper">
+              <input [type]="showLoginPassword ? 'text' : 'password'" formControlName="password" placeholder="Enter your password" />
+              <button type="button" class="modal-toggle-password" (click)="toggleLoginPassword()">
+                <svg *ngIf="!showLoginPassword" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                <svg *ngIf="showLoginPassword" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <span class="modal-error-msg" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">Password is required (min 6 chars)</span>
+            <a routerLink="/forgot-password" class="modal-forgot-link" (click)="closeLoginModal()">Forgot Password?</a>
+          </div>
+
+          <button type="submit" class="modal-submit-btn" [disabled]="isLoginLoading">
+            <span *ngIf="isLoginLoading" class="modal-btn-spinner"></span>
+            <span>Login</span>
+          </button>
+
+          <div class="modal-divider"><span>OR</span></div>
+
+          <div class="modal-social-buttons">
+            <button type="button" class="modal-social-btn google">Google</button>
+          </div>
+        </form>
+
+        <!-- Signup Form -->
+        <form *ngIf="loginModalTab === 'signup'" [formGroup]="signupForm" (ngSubmit)="onModalSignup()" class="modal-auth-form">
+          <div class="modal-form-group" [class.error]="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched">
+            <label>Full Name</label>
+            <input type="text" formControlName="fullName" placeholder="Enter full name" />
+            <span class="modal-error-msg" *ngIf="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched">Enter full name</span>
+          </div>
+
+          <div class="modal-form-group" [class.error]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+            <label>Email Id</label>
+            <input type="email" formControlName="email" placeholder="Enter your email" />
+            <span class="modal-error-msg" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">Enter a valid email</span>
+          </div>
+
+          <div class="modal-form-group" [class.error]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+            <label>Password</label>
+            <div class="modal-password-wrapper">
+              <input [type]="showSignupPassword ? 'text' : 'password'" formControlName="password" placeholder="Enter your password" />
+              <button type="button" class="modal-toggle-password" (click)="toggleSignupPassword()">
+                <svg *ngIf="!showSignupPassword" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                <svg *ngIf="showSignupPassword" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <span class="modal-error-msg" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">Password must be at least 8 characters</span>
+          </div>
+
+          <div class="modal-form-group" [class.error]="signupForm.get('mobile')?.invalid && signupForm.get('mobile')?.touched">
+            <label>Mobile Number</label>
+            <input type="tel" formControlName="mobile" placeholder="Enter mobile number" />
+            <span class="modal-error-msg" *ngIf="signupForm.get('mobile')?.invalid && signupForm.get('mobile')?.touched">Enter a valid 10-digit mobile number</span>
+          </div>
+
+          <button type="submit" class="modal-submit-btn" [disabled]="isLoginLoading">
+            <span *ngIf="isLoginLoading" class="modal-btn-spinner"></span>
+            <span>{{ isLoginLoading ? 'Creating Account...' : 'Signup' }}</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

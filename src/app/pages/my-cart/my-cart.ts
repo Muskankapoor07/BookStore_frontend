@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart.service';
 import { NotificationService } from '../../services/notification.service';
@@ -19,7 +19,7 @@ export interface AddressDetails {
 @Component({
   selector: 'app-my-cart',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NavbarComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, NavbarComponent],
   templateUrl: './my-cart.html',
   styleUrl: './my-cart.css',
 })
@@ -32,6 +32,15 @@ export class MyCart implements OnInit {
   selectedLocation: string = 'BridgeLabz Solutions LLP, No...';
   isOrderPlaced: boolean = false;
   isPlacingOrder: boolean = false;
+
+  // Login Modal
+  showLoginModal: boolean = false;
+  loginModalTab: 'login' | 'signup' = 'login';
+  showLoginPassword: boolean = false;
+  showSignupPassword: boolean = false;
+  isLoginLoading: boolean = false;
+  loginForm: FormGroup;
+  signupForm: FormGroup;
 
   address: AddressDetails = {
     fullName: '',
@@ -47,8 +56,21 @@ export class MyCart implements OnInit {
     private notificationService: NotificationService,
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+
+    this.signupForm = this.fb.group({
+      fullName: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+    });
+  }
 
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();
@@ -100,7 +122,114 @@ export class MyCart implements OnInit {
       this.notificationService.showError('Your cart is empty!', 2500);
       return;
     }
+    if (!this.authService.isLoggedIn()) {
+      this.showLoginModal = true;
+      return;
+    }
     this.step = 2;
+  }
+
+  // ================= LOGIN MODAL =================
+
+  closeLoginModal(): void {
+    this.showLoginModal = false;
+    this.loginForm.reset();
+    this.signupForm.reset();
+    this.loginModalTab = 'login';
+  }
+
+  onModalOverlayClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).classList.contains('login-modal-overlay')) {
+      this.closeLoginModal();
+    }
+  }
+
+  switchModalTab(tab: 'login' | 'signup'): void {
+    this.loginModalTab = tab;
+    this.cdr.detectChanges();
+  }
+
+  toggleLoginPassword(): void {
+    this.showLoginPassword = !this.showLoginPassword;
+  }
+
+  toggleSignupPassword(): void {
+    this.showSignupPassword = !this.showSignupPassword;
+  }
+
+  onModalLogin(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      this.notificationService.showError('Please enter a valid email and password.', 3000);
+      return;
+    }
+
+    this.isLoginLoading = true;
+    const { email, password } = this.loginForm.value;
+
+    this.authService.login({ email, password, rememberMe: false }).subscribe({
+      next: () => {
+        this.isLoginLoading = false;
+        this.showLoginModal = false;
+        this.notificationService.showSuccess('Login Successful! You can now place your order.', 3500);
+        this.cartService.fetchBackendCart();
+
+        // Pre-fill address name from user
+        const user = this.authService.getCurrentUser();
+        if (user) {
+          this.address.fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+        }
+
+        this.step = 2;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isLoginLoading = false;
+        let msg = 'Invalid email or password.';
+        if (err.status === 0) {
+          msg = 'Backend server is not running. Please start Spring Boot.';
+        } else if (err.error) {
+          msg = typeof err.error === 'string' ? err.error : (err.error.message || msg);
+        }
+        this.notificationService.showError(msg, 3500);
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  onModalSignup(): void {
+    if (this.signupForm.invalid) {
+      this.signupForm.markAllAsTouched();
+      this.notificationService.showError('Please fill in all required fields correctly.', 3000);
+      return;
+    }
+
+    this.isLoginLoading = true;
+    const { fullName, email, password } = this.signupForm.value;
+    const nameParts = fullName.trim().split(/\s+/);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : firstName;
+
+    this.authService.register({ firstName, lastName, email, password }).subscribe({
+      next: () => {
+        this.isLoginLoading = false;
+        this.signupForm.reset();
+        this.loginModalTab = 'login';
+        this.notificationService.showSuccess('Account created! Please login.', 3500);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isLoginLoading = false;
+        let msg = 'Registration failed. Please try again.';
+        if (err.status === 0) {
+          msg = 'Backend server is not running. Please start Spring Boot.';
+        } else if (err.error) {
+          msg = typeof err.error === 'string' ? err.error : (err.error.message || msg);
+        }
+        this.notificationService.showError(msg, 3500);
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   goToOrderSummary(): void {

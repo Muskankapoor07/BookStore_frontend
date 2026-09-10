@@ -23,7 +23,7 @@ export class Home implements OnInit {
   searchQuery: string = '';
   sortBy: string = 'relevance';
   currentPage: number = 1;
-  pageSize: number = 8;
+  pageSize: number = 12;
   totalItems: number = 0;
   currentYear: number = new Date().getFullYear();
 
@@ -48,11 +48,14 @@ export class Home implements OnInit {
   loadBooks(): void {
     this.isLoading = true;
     this.bookService.getBooks(this.searchQuery, this.sortBy, this.currentPage - 1, this.pageSize).subscribe({
-      next: (data: Book[]) => {
-        this.books = data || [];
+      next: (res) => {
+        this.books = res.books || [];
+        this.totalItems = res.totalElements;
+        this.totalPages = res.totalPages || Math.ceil(this.totalItems / this.pageSize);
+        this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
         this.applyFilterAndSort();
         this.isLoading = false;
-        this.cdr.detectChanges(); // Trigger instant view update as soon as books load
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error fetching books from backend:', err);
@@ -85,9 +88,6 @@ export class Home implements OnInit {
     }
 
     this.filteredBooksList = result;
-    this.totalItems = this.filteredBooksList.length;
-    this.totalPages = Math.ceil(this.totalItems / this.pageSize);
-    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
   onSearchChange(query: string): void {
@@ -110,6 +110,11 @@ export class Home implements OnInit {
 
   openBookDetail(bookId: number | string): void {
     this.router.navigate(['/book', bookId]);
+  }
+
+  onImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/default-book-cover.jpg';
   }
 
   addToCart(book: Book, event?: MouseEvent): void {

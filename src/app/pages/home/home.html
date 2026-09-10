@@ -35,7 +35,7 @@
       >
         <!-- Book Cover Box -->
         <div class="cover-wrapper">
-          <img [src]="book.coverImage" [alt]="book.title" class="book-cover" />
+          <img [src]="book.coverImage" [alt]="book.title" class="book-cover" (error)="onImgError($event)" />
 
           <!-- Out of Stock Overlay -->
           <div class="out-of-stock-overlay" *ngIf="book.isOutOfStock">

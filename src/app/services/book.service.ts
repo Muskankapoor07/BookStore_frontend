@@ -4,6 +4,12 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Book, FeedbackItem } from '../models/book.model';
 
+export interface PaginatedBooks {
+  books: Book[];
+  totalElements: number;
+  totalPages: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -19,8 +25,8 @@ export class BookService {
     searchQuery?: string,
     sortBy?: string,
     page: number = 0,
-    size: number = 20
-  ): Observable<Book[]> {
+    size: number = 12
+  ): Observable<PaginatedBooks> {
     let sortParam = 'id,asc';
     if (sortBy === 'low-to-high') {
       sortParam = 'discountPrice,asc';
@@ -29,7 +35,7 @@ export class BookService {
     } else if (sortBy === 'newest') {
       sortParam = 'id,desc';
     } else if (sortBy === 'rating') {
-      sortParam = 'id,desc';
+      sortParam = 'rating,desc';
     }
 
     let url = `${this.baseUrl}/get/book`;
@@ -46,17 +52,25 @@ export class BookService {
     return this.http.get<any>(url, { params }).pipe(
       map((response) => {
         let rawList: any[] = [];
+        let totalElements = 0;
+        let totalPages = 1;
+
         if (response && Array.isArray(response.content)) {
           rawList = response.content;
+          totalElements = response.totalElements ?? rawList.length;
+          totalPages = response.totalPages ?? 1;
         } else if (Array.isArray(response)) {
           rawList = response;
+          totalElements = rawList.length;
+          totalPages = 1;
         }
 
-        return rawList.map((item, index) => this.mapProductToBook(item, index));
+        const books = rawList.map((item, index) => this.mapProductToBook(item, index));
+        return { books, totalElements, totalPages };
       }),
       catchError((error) => {
         console.error('Error loading books from backend database:', error.message);
-        return of([]); // Strictly return empty list if backend returns error or has 0 books
+        return of({ books: [], totalElements: 0, totalPages: 1 });
       })
     );
   }
