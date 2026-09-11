@@ -258,6 +258,15 @@
   background-color: #1a1a1a;
 }
 
+.btn-wishlist.active {
+  background-color: #a03037;
+  color: #ffffff;
+}
+
+.btn-wishlist.active:hover {
+  background-color: #85252b;
+}
+
 .heart-icon {
   font-size: 1rem;
   line-height: 1;

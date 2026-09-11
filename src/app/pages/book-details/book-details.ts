@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Book, FeedbackItem } from '../../models/book.model';
 import { BookService } from '../../services/book.service';
 import { CartService } from '../../services/cart.service';
+import { WishlistService } from '../../services/wishlist.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { NavbarComponent } from '../../components/navbar/navbar';
@@ -39,6 +40,7 @@ export class BookDetails implements OnInit {
     private router: Router,
     private bookService: BookService,
     private cartService: CartService,
+    private wishlistService: WishlistService,
     private notificationService: NotificationService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
@@ -52,6 +54,14 @@ export class BookDetails implements OnInit {
         this.loadBookDetails(id);
         this.loadFeedback(id);
       }
+    });
+
+    if (this.authService.isLoggedIn()) {
+      this.wishlistService.fetchWishlist();
+    }
+
+    this.wishlistService.wishlistItems$.subscribe(() => {
+      this.cdr.detectChanges();
     });
   }
 
@@ -172,9 +182,39 @@ export class BookDetails implements OnInit {
   }
 
   addToWishlist(): void {
-    if (this.book) {
-      this.notificationService.showSuccess(`"${this.book.title}" added to wishlist!`, 2000);
+    if (!this.book) return;
+
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.showError('Please login to add books to your wishlist!', 3000);
+      this.router.navigate(['/login']);
+      return;
     }
+
+    if (this.isInWishlist()) {
+      this.wishlistService.removeFromWishlist(this.book.id).subscribe({
+        next: () => {
+          this.notificationService.showSuccess(`"${this.book?.title}" removed from wishlist.`, 2000);
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.notificationService.showError('Could not update wishlist.', 2500);
+        },
+      });
+    } else {
+      this.wishlistService.addToWishlist(this.book).subscribe({
+        next: () => {
+          this.notificationService.showSuccess(`"${this.book?.title}" added to wishlist!`, 2000);
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.notificationService.showError('Could not add to wishlist.', 2500);
+        },
+      });
+    }
+  }
+
+  isInWishlist(): boolean {
+    return this.book ? this.wishlistService.isInWishlist(this.book.id) : false;
   }
 
   onSearch(query: string): void {

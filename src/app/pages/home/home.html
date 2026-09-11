@@ -37,6 +37,17 @@
         <div class="cover-wrapper">
           <img [src]="book.coverImage" [alt]="book.title" class="book-cover" (error)="onImgError($event)" />
 
+          <!-- Wishlist Heart Button -->
+          <button
+            type="button"
+            class="card-wishlist-btn"
+            [class.active]="isInWishlist(book.id)"
+            (click)="toggleWishlist(book, $event)"
+            title="Wishlist"
+          >
+            ♥
+          </button>
+
           <!-- Out of Stock Overlay -->
           <div class="out-of-stock-overlay" *ngIf="book.isOutOfStock">
             <span class="out-of-stock-tag">OUT OF STOCK</span>
@@ -62,6 +73,17 @@
           <div class="price-row">
             <span class="discount-price">Rs. {{ book.discountPrice }}</span>
             <span class="original-price">Rs. {{ book.originalPrice }}</span>
+          </div>
+
+          <!-- Card Action Button -->
+          <div class="card-action-row" *ngIf="!book.isOutOfStock">
+            <button
+              type="button"
+              class="btn-card-add"
+              (click)="addToCart(book, $event)"
+            >
+              ADD TO BAG
+            </button>
           </div>
         </div>
       </div>

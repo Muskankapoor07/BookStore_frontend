@@ -234,6 +234,10 @@ export class CartService {
     this.cartCountSubject.next(0);
   }
 
+  updateCustomerDetails(details: { addressType: string; fullAddress: string; city: string; state: string; mobileNumber?: string }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/edit_user`, details);
+  }
+
   placeOrder(): Observable<any> {
     const currentItems = this.cartItemsSubject.value;
     const orderPayload = {
@@ -241,19 +245,14 @@ export class CartService {
         product_id: String(item.book.id),
         product_name: item.book.title,
         product_quantity: item.quantity,
-        product_price: item.book.discountPrice,
+        product_price: item.book.discountPrice !== undefined ? item.book.discountPrice : item.book.originalPrice,
       })),
     };
 
     if (this.authService.isLoggedIn()) {
-      return this.http.post(`${this.apiUrl}/add/order`, orderPayload).pipe(
-        catchError((err) => {
-          console.warn('Place order API call failed:', err.message);
-          return of({ success: true, message: 'Order placed' });
-        })
-      );
+      return this.http.post<any>(`${this.apiUrl}/add/order`, orderPayload);
     } else {
-      return of({ success: true, message: 'Local order placed' });
+      return of({ id: Math.floor(100000 + Math.random() * 900000) });
     }
   }
 

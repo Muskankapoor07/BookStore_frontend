@@ -29,9 +29,10 @@ export class MyCart implements OnInit {
   searchQuery: string = '';
   currentYear: number = new Date().getFullYear();
 
-  selectedLocation: string = 'BridgeLabz Solutions LLP, No...';
+  selectedLocation: string = 'Use current location';
   isOrderPlaced: boolean = false;
   isPlacingOrder: boolean = false;
+  placedOrderId: string | number = '123456';
 
   // Login Modal
   showLoginModal: boolean = false;
@@ -75,16 +76,46 @@ export class MyCart implements OnInit {
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.address.fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      this.populateAddressFromUser(user);
+    }
+
+    if (this.authService.isLoggedIn()) {
+      this.authService.getProfile().subscribe({
+        next: (profile) => {
+          if (profile) {
+            this.populateAddressFromUser(profile);
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => console.warn('Could not fetch user profile:', err),
+      });
+      this.cartService.fetchBackendCart();
     }
 
     this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items || [];
       this.cdr.detectChanges();
     });
+  }
 
-    if (this.authService.isLoggedIn()) {
-      this.cartService.fetchBackendCart();
+  private populateAddressFromUser(user: any): void {
+    if (!this.address.fullName) {
+      this.address.fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+    }
+    if (user.mobileNumber && !this.address.mobileNumber) {
+      this.address.mobileNumber = user.mobileNumber;
+    }
+    if (user.fullAddress && !this.address.address) {
+      this.address.address = user.fullAddress;
+    }
+    if (user.city && !this.address.city) {
+      this.address.city = user.city;
+    }
+    if (user.state && !this.address.state) {
+      this.address.state = user.state;
+    }
+    if (user.addressType && !this.address.type) {
+      this.address.type = user.addressType;
     }
   }
 
@@ -174,7 +205,7 @@ export class MyCart implements OnInit {
     this.isLoginLoading = true;
     const { email, password } = this.loginForm.value;
 
-    this.authService.login({ email, password, rememberMe: false }).subscribe({
+    this.authService.login({ email, password, rememberMe: true }).subscribe({
       next: () => {
         this.isLoginLoading = false;
         this.showLoginModal = false;
@@ -244,6 +275,25 @@ export class MyCart implements OnInit {
       this.notificationService.showError('Please fill all address details before continuing.', 2500);
       return;
     }
+
+    // Persist address details to backend via /edit_user
+    if (this.authService.isLoggedIn()) {
+      this.cartService.updateCustomerDetails({
+        addressType: this.address.type || 'Home',
+        fullAddress: this.address.address,
+        city: this.address.city,
+        state: this.address.state,
+        mobileNumber: this.address.mobileNumber,
+      }).subscribe({
+        next: (updatedUser) => {
+          if (updatedUser) {
+            this.authService.setUser(updatedUser);
+          }
+        },
+        error: (err) => console.warn('Could not update customer details in backend:', err),
+      });
+    }
+
     this.step = 3;
   }
 
@@ -255,20 +305,74 @@ export class MyCart implements OnInit {
 
     this.isPlacingOrder = true;
     this.cartService.placeOrder().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isPlacingOrder = false;
         this.isOrderPlaced = true;
         this.step = 4;
+        const realId = res?.id ?? res?.orderId ?? res?.data?.id ?? res?.data?.orderId ?? (Array.isArray(res) && res[0]?.id ? res[0].id : null);
+        this.placedOrderId = realId !== null && realId !== undefined ? String(realId) : '';
         this.cartService.clearCart();
         this.notificationService.showSuccess('Order placed successfully!', 3000);
         this.cdr.detectChanges();
       },
       error: (err) => {
         this.isPlacingOrder = false;
-        this.notificationService.showError('Failed to place order. Please try again.', 3000);
+        let msg = 'Failed to place order. Please try again.';
+        if (err.status === 401 || err.status === 403) {
+          msg = 'Session expired. Please login again to place order.';
+          this.authService.logout();
+          this.showLoginModal = true;
+        } else if (err.status === 0) {
+          msg = 'Session expired or backend unreachable. Please login again to complete order.';
+          this.showLoginModal = true;
+        } else if (err.error) {
+          msg = typeof err.error === 'string' ? err.error : (err.error.message || err.error.error || msg);
+        }
+        this.notificationService.showError(msg, 3500);
         this.cdr.detectChanges();
       },
     });
+  }
+
+  continueShopping(): void {
+    this.isOrderPlaced = false;
+    this.step = 1;
+    this.router.navigate(['/home']);
+  }
+
+  getOrderEmail(): string {
+    const user = this.authService.getCurrentUser();
+    return user?.email || '';
+  }
+
+  getOrderContact(): string {
+    const user = this.authService.getCurrentUser();
+    return this.address.mobileNumber || user?.mobileNumber || '';
+  }
+
+  getOrderAddress(): string {
+    const parts = [
+      this.address.address,
+      this.address.city,
+      this.address.state
+    ].filter((p) => p && p.trim().length > 0);
+
+    if (parts.length > 0) {
+      return parts.join(', ');
+    }
+
+    const user = this.authService.getCurrentUser();
+    const userParts = [
+      user?.fullAddress,
+      user?.city,
+      user?.state
+    ].filter((p) => p && p.trim().length > 0);
+
+    if (userParts.length > 0) {
+      return userParts.join(', ');
+    }
+
+    return '';
   }
 
   onSearch(query: string): void {

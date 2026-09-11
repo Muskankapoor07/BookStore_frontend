@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { Book } from '../../models/book.model';
 import { BookService } from '../../services/book.service';
 import { CartService } from '../../services/cart.service';
+import { WishlistService } from '../../services/wishlist.service';
+import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { NavbarComponent } from '../../components/navbar/navbar';
 
@@ -33,6 +35,8 @@ export class Home implements OnInit {
   constructor(
     private bookService: BookService,
     private cartService: CartService,
+    private wishlistService: WishlistService,
+    private authService: AuthService,
     private notificationService: NotificationService,
     private router: Router,
     private cdr: ChangeDetectorRef
@@ -40,6 +44,12 @@ export class Home implements OnInit {
 
   ngOnInit(): void {
     this.loadBooks();
+    if (this.authService.isLoggedIn()) {
+      this.wishlistService.fetchWishlist();
+    }
+    this.wishlistService.wishlistItems$.subscribe(() => {
+      this.cdr.detectChanges();
+    });
   }
 
   /**
@@ -126,6 +136,35 @@ export class Home implements OnInit {
       this.notificationService.showSuccess(`"${book.title}" added to cart!`, 2000);
       this.cdr.detectChanges();
     }
+  }
+
+  toggleWishlist(book: Book, event: MouseEvent): void {
+    event.stopPropagation();
+    if (!this.authService.isLoggedIn()) {
+      this.notificationService.showError('Please login to manage your wishlist!', 2500);
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.isInWishlist(book.id)) {
+      this.wishlistService.removeFromWishlist(book.id).subscribe({
+        next: () => {
+          this.notificationService.showSuccess(`"${book.title}" removed from wishlist.`, 2000);
+          this.cdr.detectChanges();
+        },
+      });
+    } else {
+      this.wishlistService.addToWishlist(book).subscribe({
+        next: () => {
+          this.notificationService.showSuccess(`"${book.title}" added to wishlist!`, 2000);
+          this.cdr.detectChanges();
+        },
+      });
+    }
+  }
+
+  isInWishlist(bookId: number | string): boolean {
+    return this.wishlistService.isInWishlist(bookId);
   }
 }
 

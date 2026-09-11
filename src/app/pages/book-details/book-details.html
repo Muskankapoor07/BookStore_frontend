@@ -75,8 +75,13 @@
             ADD TO BAG
           </button>
 
-          <button class="btn-wishlist" (click)="addToWishlist()">
-            <span class="heart-icon">♥</span> WISHLIST
+          <button
+            class="btn-wishlist"
+            [class.active]="isInWishlist()"
+            (click)="addToWishlist()"
+          >
+            <span class="heart-icon">{{ isInWishlist() ? '♥' : '♡' }}</span>
+            {{ isInWishlist() ? 'WISHLISTED' : 'WISHLIST' }}
           </button>
         </div>
       </div>

@@ -5,8 +5,8 @@
     (search)="onSearch($event)"
   ></app-navbar>
 
-  <!-- Main Container -->
-  <main class="page-container">
+  <!-- Main Container (Cart View) -->
+  <main class="page-container" *ngIf="!isOrderPlaced">
     <!-- Breadcrumbs -->
     <nav class="breadcrumb-nav">
       <a routerLink="/home" class="breadcrumb-link">Home</a>
@@ -26,7 +26,7 @@
           <div class="location-selector" *ngIf="cartItems.length > 0">
             <span class="location-icon">📍</span>
             <select [(ngModel)]="selectedLocation" class="location-select">
-              <option value="BridgeLabz Solutions LLP, No...">BridgeLabz Solutions LLP, No...</option>
+              <option value="Use current location">Use current location</option>
               <option value="Home Address">Home Address</option>
               <option value="Workplace Address">Workplace Address</option>
             </select>
@@ -80,22 +80,10 @@
         </div>
 
         <!-- Empty Cart State -->
-        <div class="empty-cart-box" *ngIf="cartItems.length === 0 && !isOrderPlaced">
+        <div class="empty-cart-box" *ngIf="cartItems.length === 0">
           <p class="empty-title">Your cart is currently empty</p>
           <p class="empty-sub">Explore our collection and add your favorite books!</p>
           <button routerLink="/home" class="btn-primary-blue" style="margin-top: 1rem;">
-            CONTINUE SHOPPING
-          </button>
-        </div>
-
-        <!-- Order Success State -->
-        <div class="empty-cart-box" *ngIf="isOrderPlaced">
-          <div style="font-size: 3rem; color: #2e7d32; margin-bottom: 0.5rem;">✔</div>
-          <h2 style="color: #2e7d32; font-size: 1.4rem;">Order Placed Successfully!</h2>
-          <p style="color: #666; margin-top: 0.5rem; font-size: 0.9rem;">
-            Thank you for shopping with Bookstore. Your order is being processed.
-          </p>
-          <button routerLink="/home" class="btn-primary-blue" style="margin-top: 1.2rem;">
             CONTINUE SHOPPING
           </button>
         </div>
@@ -208,6 +196,87 @@
         </div>
       </div>
 
+    </div>
+  </main>
+
+  <!-- ================= ORDER SUCCESS CELEBRATION PAGE ================= -->
+  <main class="order-success-page" *ngIf="isOrderPlaced">
+    <div class="order-success-container">
+      <!-- Celebration Confetti Illustration -->
+      <div class="celebration-wrapper">
+        <svg width="220" height="150" viewBox="0 0 220 150" fill="none" xmlns="http://www.w3.org/2000/svg" class="celebration-svg">
+          <!-- Confetti lines radiating outward -->
+          <line x1="88" y1="28" x2="78" y2="12" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+          <line x1="97" y1="36" x2="93" y2="22" stroke="#FF9800" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="132" y1="28" x2="142" y2="12" stroke="#4CAF50" stroke-width="3" stroke-linecap="round"/>
+          <line x1="123" y1="36" x2="127" y2="22" stroke="#00BCD4" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="68" y1="46" x2="50" y2="36" stroke="#2196F3" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="62" y1="58" x2="44" y2="54" stroke="#E91E63" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="152" y1="46" x2="170" y2="36" stroke="#9C27B0" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="158" y1="58" x2="176" y2="54" stroke="#FF5722" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Confetti Dots -->
+          <circle cx="110" cy="14" r="2.5" fill="#E53935"/>
+          <circle cx="78" cy="24" r="2" fill="#FFC107"/>
+          <circle cx="142" cy="24" r="2" fill="#E91E63"/>
+          <circle cx="56" cy="68" r="2.5" fill="#2196F3"/>
+          <circle cx="164" cy="68" r="2.5" fill="#4CAF50"/>
+          <circle cx="85" cy="44" r="2" fill="#4CAF50"/>
+          <circle cx="135" cy="44" r="2" fill="#2196F3"/>
+
+          <!-- 3 Golden Stars -->
+          <!-- Center Big Star -->
+          <polygon points="110,38 114,50 127,50 116.5,58 120.5,70 110,62 99.5,70 103.5,58 93,50 106,50" fill="#FFC107"/>
+          <!-- Left Star -->
+          <polygon points="85,52 87.5,60 96,60 89,65 91.5,73 85,68 78.5,73 81,65 74,60 82.5,60" fill="#FFD54F"/>
+          <!-- Right Star -->
+          <polygon points="135,52 137.5,60 146,60 139,65 141.5,73 135,68 128.5,73 131,65 124,60 132.5,60" fill="#FFD54F"/>
+
+          <!-- Bottom streamers -->
+          <circle cx="92" cy="88" r="2" fill="#4CAF50"/>
+          <circle cx="128" cy="88" r="2" fill="#E53935"/>
+          <line x1="104" y1="84" x2="104" y2="98" stroke="#00BCD4" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="110" y1="86" x2="110" y2="104" stroke="#E53935" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="116" y1="84" x2="116" y2="98" stroke="#4CAF50" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Bottom Curved pink arc & dots -->
+          <path d="M96 104 C104 110, 116 110, 124 104" stroke="#E91E63" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="118" cy="112" r="2.5" fill="#FFC107"/>
+          <circle cx="102" cy="112" r="2" fill="#2196F3"/>
+        </svg>
+      </div>
+
+      <h1 class="order-success-title">Order Placed Successfully</h1>
+
+      <p class="order-success-text">
+        hurray!!! your order is confirmed<br />
+        the order id is #{{ placedOrderId }} save the order id for<br />
+        further communication..
+      </p>
+
+      <!-- Contact and Address Table -->
+      <div class="order-table-wrapper">
+        <table class="order-summary-table">
+          <thead>
+            <tr>
+              <th class="col-email">Email us</th>
+              <th class="col-contact">Contact us</th>
+              <th class="col-address">Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-email">{{ getOrderEmail() }}</td>
+              <td class="col-contact">{{ getOrderContact() }}</td>
+              <td class="col-address">{{ getOrderAddress() }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <button class="btn-continue-shopping" (click)="continueShopping()">
+        CONTINUE SHOPPING
+      </button>
     </div>
   </main>
 

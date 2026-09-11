@@ -83,6 +83,16 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  getProfile(): Observable<UserResponse> {
+    return this.http.get<UserResponse>(`${this.apiUrl}/profile`).pipe(
+      tap((user) => {
+        if (user) {
+          this.setUser(user);
+        }
+      })
+    );
+  }
+
   setUser(user: UserResponse): void {
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUserSubject.next(user);
