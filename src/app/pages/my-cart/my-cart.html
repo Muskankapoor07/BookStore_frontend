@@ -231,7 +231,7 @@
       <!-- Right Panel - Login/Signup Form -->
       <div class="modal-right-panel">
         <!-- Close Button -->
-        <button class="modal-close-btn" (click)="closeLoginModal()">✕</button>
+        <button class="modal-close-btn" (click)="closeLoginModal()" title="Close" aria-label="Close">✕</button>
 
         <!-- Tab Headers -->
         <div class="modal-tab-header">
@@ -240,7 +240,7 @@
         </div>
 
         <!-- Login Form -->
-        <form *ngIf="loginModalTab === 'login'" [formGroup]="loginForm" (ngSubmit)="onModalLogin()" class="modal-auth-form">
+        <form *ngIf="loginModalTab === 'login'" [formGroup]="loginForm" (ngSubmit)="onModalLogin()" class="modal-auth-form modal-login-form">
           <div class="modal-form-group" [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
             <label>Email Id</label>
             <input type="email" formControlName="email" placeholder="Enter your email" />
@@ -273,7 +273,7 @@
         </form>
 
         <!-- Signup Form -->
-        <form *ngIf="loginModalTab === 'signup'" [formGroup]="signupForm" (ngSubmit)="onModalSignup()" class="modal-auth-form">
+        <form *ngIf="loginModalTab === 'signup'" [formGroup]="signupForm" (ngSubmit)="onModalSignup()" class="modal-auth-form modal-signup-form">
           <div class="modal-form-group" [class.error]="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched">
             <label>Full Name</label>
             <input type="text" formControlName="fullName" placeholder="Enter full name" />

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -130,6 +130,13 @@ export class MyCart implements OnInit {
   }
 
   // ================= LOGIN MODAL =================
+
+  @HostListener('document:keydown.escape')
+  onEscapePress(): void {
+    if (this.showLoginModal) {
+      this.closeLoginModal();
+    }
+  }
 
   closeLoginModal(): void {
     this.showLoginModal = false;

@@ -478,9 +478,9 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.55);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.45);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -495,40 +495,45 @@
 
 .login-modal-container {
   display: flex;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  align-items: center;
+  justify-content: center;
+  position: relative;
   animation: modalSlideIn 0.3s ease;
-  max-height: 90vh;
 }
 
 @keyframes modalSlideIn {
-  from { opacity: 0; transform: scale(0.92) translateY(15px); }
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* Left Panel */
+/* Left Panel - Circular Illustration Card */
 .modal-left-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  padding: 1.5rem 1.8rem;
-  width: 240px;
-  min-height: 320px;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 1.2rem 3rem 1.2rem 1.2rem;
+  width: 245px;
+  height: 275px;
   box-sizing: border-box;
+  margin-right: -45px;
+  margin-top: 25px;
+  z-index: 1;
+  position: relative;
 }
 
 .modal-illustration-wrapper {
-  width: 170px;
-  height: 170px;
+  width: 125px;
+  height: 125px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .modal-illustration {
@@ -538,88 +543,101 @@
 }
 
 .modal-brand-title {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: #2c2c2c;
-  letter-spacing: 1.4px;
+  color: #0a0102;
+  letter-spacing: 1px;
   text-transform: uppercase;
   margin: 0;
   text-align: center;
+  line-height: 1.3;
 }
 
-/* Right Panel */
+/* Right Panel - Login & Signup Form Card */
 .modal-right-panel {
   background: #ffffff;
-  padding: 1.4rem 1.8rem;
-  width: 290px;
-  min-height: 320px;
+  border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  padding: 1.3rem 1.6rem 1.2rem 1.6rem;
+  width: 295px;
+  height: 335px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   position: relative;
-  border-left: 1px solid #f0f0f0;
+  z-index: 2;
+  border: none;
 }
 
+/* Close Button */
 .modal-close-btn {
   position: absolute;
-  top: 0.6rem;
-  right: 0.7rem;
+  top: 0.55rem;
+  right: 0.65rem;
   background: none;
   border: none;
-  font-size: 1rem;
-  color: #999;
+  font-size: 0.95rem;
+  color: #878787;
   cursor: pointer;
-  padding: 0.2rem 0.4rem;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   transition: all 0.2s ease;
   line-height: 1;
+  padding: 0;
+  z-index: 10;
 }
 
 .modal-close-btn:hover {
-  color: #333;
-  background-color: #f0f0f0;
+  color: #0a0102;
+  background-color: #f2f2f2;
 }
 
 /* Tab Header */
 .modal-tab-header {
   display: flex;
-  gap: 1.8rem;
-  margin-bottom: 1rem;
-  justify-content: center;
+  gap: 1.6rem;
+  margin-bottom: 0.9rem;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .modal-tab-btn {
   background: none;
   border: none;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  letter-spacing: 1.2px;
-  color: #9e9e9e;
+  letter-spacing: 0.5px;
+  color: #878787;
   cursor: pointer;
-  padding: 0.15rem 0.1rem;
+  padding: 0 0 0.25rem 0;
   position: relative;
-  transition: color 0.25s ease;
+  transition: color 0.2s ease;
   text-transform: uppercase;
+  font-family: inherit;
 }
 
 .modal-tab-btn:hover {
-  color: #555;
+  color: #333333;
 }
 
 .modal-tab-btn.active {
-  color: #2c2c2c;
+  color: #0a0102;
   font-weight: 700;
 }
 
 .modal-tab-btn.active::after {
   content: '';
   position: absolute;
-  bottom: -3px;
+  bottom: -2px;
   left: 50%;
   transform: translateX(-50%);
-  width: 22px;
+  width: 20px;
   height: 2.5px;
-  background-color: #8b1a1a;
+  background-color: #a03037;
   border-radius: 2px;
 }
 
@@ -627,7 +645,6 @@
 .modal-auth-form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   animation: modalFormFade 0.25s ease;
 }
 
@@ -639,43 +656,66 @@
 .modal-form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  margin-bottom: 0.55rem;
+}
+
+/* Signup Form Compact Spacing */
+.modal-signup-form .modal-form-group {
+  margin-bottom: 0.35rem;
+}
+
+.modal-signup-form .modal-form-group label {
+  font-size: 0.6rem;
+  margin-bottom: 0.15rem;
+}
+
+.modal-signup-form .modal-form-group input {
+  height: 27px;
+  padding: 0 0.55rem;
+  font-size: 0.73rem;
+}
+
+.modal-signup-form .modal-submit-btn {
+  margin-top: 0.45rem;
+  height: 31px;
 }
 
 .modal-form-group label {
-  font-size: 0.65rem;
-  font-weight: 500;
-  color: #555;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #0a0102;
+  margin-bottom: 0.2rem;
 }
 
 .modal-form-group input {
   width: 100%;
-  padding: 0.4rem 0.5rem;
+  height: 30px;
+  padding: 0 0.6rem;
   border: 1px solid #e0e0e0;
   border-radius: 2px;
-  font-size: 0.78rem;
-  color: #333;
-  background: #fff;
+  font-size: 0.75rem;
+  color: #333333;
+  background: #ffffff;
   outline: none;
   transition: border-color 0.2s ease;
   box-sizing: border-box;
 }
 
 .modal-form-group input::placeholder {
-  color: #bbb;
+  color: #bbbbbb;
   font-size: 0.72rem;
 }
 
 .modal-form-group input:focus {
-  border-color: #8b1a1a;
+  border-color: #a03037;
 }
 
 .modal-form-group.error label {
-  color: #a52222;
+  color: #a03037;
 }
 
 .modal-form-group.error input {
-  border-color: #a52222;
+  border-color: #a03037;
 }
 
 .modal-error-msg {
@@ -690,6 +730,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .modal-password-wrapper input {
@@ -698,13 +739,13 @@
 
 .modal-toggle-password {
   position: absolute;
-  right: 0.3rem;
+  right: 0.4rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  color: #999;
+  color: #878787;
   padding: 0.1rem;
   display: flex;
   align-items: center;
@@ -713,60 +754,62 @@
 }
 
 .modal-toggle-password:hover {
-  color: #555;
+  color: #333333;
+}
+
+.modal-toggle-password svg {
+  width: 14px;
+  height: 14px;
 }
 
 .modal-forgot-link {
-  font-size: 0.6rem;
-  color: #8b1a1a;
+  font-size: 0.58rem;
+  color: #878787;
   text-align: right;
   text-decoration: none;
-  margin-top: 2px;
+  margin-top: 0.2rem;
   font-weight: 500;
+  display: block;
   transition: color 0.2s ease;
 }
 
 .modal-forgot-link:hover {
-  color: #5a1010;
+  color: #a03037;
   text-decoration: underline;
 }
 
 /* Submit Button */
 .modal-submit-btn {
   width: 100%;
-  padding: 0.45rem;
-  background: linear-gradient(135deg, #a52222 0%, #7b1a1a 100%);
-  color: #fff;
-  font-size: 0.8rem;
+  height: 32px;
+  background: #a03037;
+  color: #ffffff;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.3px;
   border: none;
   border-radius: 3px;
   cursor: pointer;
-  margin-top: 0.3rem;
+  margin-top: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+  transition: background-color 0.2s ease;
 }
 
 .modal-submit-btn:hover {
-  background: linear-gradient(135deg, #8b1a1a 0%, #5a1010 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(139, 26, 26, 0.3);
+  background-color: #82242a;
 }
 
 .modal-submit-btn:disabled {
   opacity: 0.75;
   cursor: not-allowed;
-  transform: none !important;
-  box-shadow: none !important;
 }
 
 .modal-btn-spinner {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   border: 2px solid rgba(255, 255, 255, 0.35);
   border-top-color: #ffffff;
   border-radius: 50%;
@@ -783,7 +826,7 @@
 .modal-divider {
   display: flex;
   align-items: center;
-  margin: 0.35rem 0;
+  margin: 0.7rem 0 0.55rem 0;
 }
 
 .modal-divider::before,
@@ -791,76 +834,88 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: #ddd;
+  background: #e4e4e4;
 }
 
 .modal-divider span {
   padding: 0 0.6rem;
-  font-size: 0.65rem;
-  color: #999;
-  font-weight: 500;
+  font-size: 0.68rem;
+  color: #333333;
+  font-weight: 700;
 }
 
 /* Social Buttons */
 .modal-social-buttons {
   display: flex;
-  gap: 0.5rem;
-  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
 }
 
 .modal-social-btn {
   flex: 1;
-  padding: 0.38rem 0.7rem;
+  height: 29px;
   border: none;
-  border-radius: 3px;
+  border-radius: 2px;
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.15s ease;
-  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .modal-social-btn:hover {
-  opacity: 0.88;
-  transform: translateY(-1px);
+  opacity: 0.92;
 }
 
 .modal-social-btn.facebook {
-  background: #3b5998;
-  color: #fff;
+  background-color: #3b5998;
+  color: #ffffff;
+}
+
+.modal-social-btn.facebook:hover {
+  background-color: #324c80;
 }
 
 .modal-social-btn.google {
-  background: #f1f1f1;
-  color: #444;
-  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  color: #444444;
+  border: 1px solid #e0e0e0;
 }
 
 .modal-social-btn.google:hover {
-  background: #e8e8e8;
+  background-color: #eaeaea;
 }
 
 /* Responsive Modal */
-@media screen and (max-width: 580px) {
+@media screen and (max-width: 680px) {
   .login-modal-container {
     flex-direction: column;
+    align-items: center;
     max-width: 90vw;
   }
 
   .modal-left-panel {
     width: 100%;
+    max-width: 270px;
+    height: auto;
     min-height: auto;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: -15px;
     padding: 1rem;
   }
 
   .modal-illustration-wrapper {
-    width: 100px;
-    height: 100px;
+    width: 95px;
+    height: 95px;
   }
 
   .modal-right-panel {
     width: 100%;
-    border-left: none;
-    border-top: 1px solid #f0f0f0;
+    max-width: 280px;
+    min-height: auto;
+    padding: 1.2rem 1.1rem;
   }
 }
