@@ -13,6 +13,7 @@ export interface AddressDetails {
   address: string;
   city: string;
   state: string;
+  pincode?: string;
   type: string;
 }
 
@@ -25,7 +26,7 @@ export interface AddressDetails {
 })
 export class MyCart implements OnInit {
   cartItems: CartItem[] = [];
-  step: number = 1; // 1 = My Cart, 2 = Address Details, 3 = Order Summary, 4 = Order Success
+  step: number = 1; // 1 = My Cart, 2 = Customer Details, 3 = Order Summary, 4 = Order Success
   searchQuery: string = '';
   currentYear: number = new Date().getFullYear();
 
@@ -49,6 +50,7 @@ export class MyCart implements OnInit {
     address: '',
     city: '',
     state: '',
+    pincode: '',
     type: 'Home',
   };
 
@@ -113,6 +115,9 @@ export class MyCart implements OnInit {
     }
     if (user.state && !this.address.state) {
       this.address.state = user.state;
+    }
+    if (user.pincode && !this.address.pincode) {
+      this.address.pincode = user.pincode;
     }
     if (user.addressType && !this.address.type) {
       this.address.type = user.addressType;
@@ -278,9 +283,13 @@ export class MyCart implements OnInit {
 
     // Persist address details to backend via /edit_user
     if (this.authService.isLoggedIn()) {
+      const fullAddressToSave = this.address.pincode && this.address.pincode.trim()
+        ? `${this.address.address} - ${this.address.pincode.trim()}`
+        : this.address.address;
+
       this.cartService.updateCustomerDetails({
         addressType: this.address.type || 'Home',
-        fullAddress: this.address.address,
+        fullAddress: fullAddressToSave,
         city: this.address.city,
         state: this.address.state,
         mobileNumber: this.address.mobileNumber,
@@ -295,6 +304,34 @@ export class MyCart implements OnInit {
     }
 
     this.step = 3;
+    this.cdr.detectChanges();
+  }
+
+  editCustomerDetails(): void {
+    this.step = 2;
+    this.cdr.detectChanges();
+  }
+
+  getFormattedAddress(): string {
+    const parts: string[] = [];
+    if (this.address.address && this.address.address.trim()) {
+      parts.push(this.address.address.trim());
+    }
+    if (this.address.city && this.address.city.trim()) {
+      parts.push(this.address.city.trim());
+    }
+    if (this.address.state && this.address.state.trim()) {
+      let statePart = this.address.state.trim();
+      if (this.address.pincode && this.address.pincode.trim()) {
+        statePart += ` - ${this.address.pincode.trim()}`;
+      }
+      parts.push(statePart);
+    } else if (this.address.pincode && this.address.pincode.trim()) {
+      parts.push(this.address.pincode.trim());
+    }
+
+    const baseAddress = parts.join(', ');
+    return this.address.type ? `${baseAddress} (${this.address.type})` : baseAddress;
   }
 
   checkoutOrder(): void {

@@ -89,13 +89,22 @@
         </div>
       </div>
 
-      <!-- Section 2: Address Details -->
+      <!-- Section 2: Customer Details -->
       <div class="cart-card accordion-card" [class.collapsed]="step < 2">
-        <div class="accordion-header" (click)="step >= 2 ? (step = (step === 2 ? 1 : 2)) : null">
-          <h2 class="card-title">Address Details</h2>
+        <div class="accordion-header customer-details-header">
+          <h2 class="card-title">Customer Details</h2>
+          <button
+            type="button"
+            class="btn-edit-details"
+            *ngIf="step >= 3 && !isOrderPlaced"
+            (click)="editCustomerDetails()"
+          >
+            Edit
+          </button>
         </div>
 
-        <div class="accordion-body" *ngIf="step >= 2 && !isOrderPlaced">
+        <!-- Mode A: Editable Address Form when on step 2 -->
+        <div class="accordion-body" *ngIf="step === 2 && !isOrderPlaced">
           <div class="address-form">
             <div class="form-row-two">
               <div class="form-group">
@@ -113,7 +122,7 @@
               <textarea [(ngModel)]="address.address" rows="3" placeholder="Enter complete flat / house no, street, locality" class="form-textarea"></textarea>
             </div>
 
-            <div class="form-row-two">
+            <div class="form-row-three">
               <div class="form-group">
                 <label>City / Town</label>
                 <input type="text" [(ngModel)]="address.city" placeholder="City" class="form-input" />
@@ -121,6 +130,10 @@
               <div class="form-group">
                 <label>State</label>
                 <input type="text" [(ngModel)]="address.state" placeholder="State" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label>Pincode</label>
+                <input type="text" [(ngModel)]="address.pincode" placeholder="Pincode" class="form-input" />
               </div>
             </div>
 
@@ -138,58 +151,60 @@
               </label>
             </div>
 
-            <div class="place-order-row" *ngIf="step === 2">
+            <div class="place-order-row">
               <button class="btn-primary-blue" (click)="goToOrderSummary()">
                 CONTINUE
               </button>
             </div>
           </div>
         </div>
+
+        <!-- Mode B: Read-only compact Customer Details summary when on step >= 3 -->
+        <div class="accordion-body customer-summary-body" *ngIf="step >= 3 && !isOrderPlaced">
+          <div class="customer-details-summary">
+            <div class="customer-summary-name-phone">
+              <span class="customer-name-label">{{ address.fullName || 'User' }}</span>
+              <span class="customer-phone-label">{{ address.mobileNumber }}</span>
+            </div>
+            <p class="customer-address-line">
+              {{ getFormattedAddress() }}
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- Section 3: Order summary -->
       <div class="cart-card accordion-card" [class.collapsed]="step < 3">
-        <div class="accordion-header" (click)="step >= 3 ? (step = (step === 3 ? 2 : 3)) : null">
+        <div class="accordion-header">
           <h2 class="card-title">Order summary</h2>
         </div>
 
         <div class="accordion-body" *ngIf="step >= 3 && !isOrderPlaced">
-          <div class="order-summary-list">
-            <div class="summary-item-row" *ngFor="let item of cartItems">
-              <img [src]="item.book.coverImage" [alt]="item.book.title" class="summary-item-img" />
-              <div class="summary-item-info">
-                <h4 class="summary-title">{{ item.book.title }}</h4>
-                <p class="summary-author">by {{ item.book.author }}</p>
-                <p class="summary-price">
-                  Rs. {{ item.book.discountPrice }} × {{ item.quantity }} = <strong>Rs. {{ item.book.discountPrice * item.quantity }}</strong>
-                </p>
+          <div class="order-summary-items-list">
+            <div class="order-summary-item-card" *ngFor="let item of cartItems">
+              <div class="summary-item-cover-wrapper">
+                <img [src]="item.book.coverImage" [alt]="item.book.title" class="summary-item-cover-img" />
+              </div>
+              <div class="summary-item-details">
+                <h4 class="summary-item-title">{{ item.book.title }}</h4>
+                <p class="summary-item-author">by {{ item.book.author }}</p>
+                <div class="summary-item-price-qty-row">
+                  <span class="summary-item-price">Rs. {{ item.book.discountPrice }}</span>
+                  <span class="summary-qty-pill">Qty: {{ item.quantity }}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Total Calculation Box -->
-          <div class="total-calculation-box">
-            <div class="calc-row">
-              <span>Total Price:</span>
-              <span>Rs. {{ getOriginalTotalPrice() }}</span>
-            </div>
-            <div class="calc-row discount-row" *ngIf="getTotalDiscount() > 0">
-              <span>Discount:</span>
-              <span>- Rs. {{ getTotalDiscount() }}</span>
-            </div>
-            <div class="calc-row">
-              <span>Delivery Charges:</span>
-              <span class="free-text">FREE</span>
-            </div>
-            <hr />
-            <div class="calc-row final-row">
-              <span>Total Payable Amount:</span>
-              <span>Rs. {{ getTotalPrice() }}</span>
-            </div>
+          <div class="order-summary-dotted-divider"></div>
+
+          <div class="order-summary-total-row">
+            <span class="total-payable-label">Total Payable Amount:</span>
+            <span class="total-payable-value">Rs. {{ getTotalPrice() }}</span>
           </div>
 
-          <div class="place-order-row">
-            <button class="btn-primary-blue" [disabled]="isPlacingOrder" (click)="checkoutOrder()">
+          <div class="order-summary-checkout-row">
+            <button class="btn-checkout-blue" [disabled]="isPlacingOrder" (click)="checkoutOrder()">
               {{ isPlacingOrder ? 'CHECKING OUT...' : 'CHECKOUT' }}
             </button>
           </div>
@@ -204,7 +219,7 @@
     <div class="order-success-container">
       <!-- Celebration Confetti Illustration -->
       <div class="celebration-wrapper">
-        <svg width="220" height="150" viewBox="0 0 220 150" fill="none" xmlns="http://www.w3.org/2000/svg" class="celebration-svg">
+        <svg width="135" height="92" viewBox="0 0 220 150" fill="none" xmlns="http://www.w3.org/2000/svg" class="celebration-svg">
           <!-- Confetti lines radiating outward -->
           <line x1="88" y1="28" x2="78" y2="12" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
           <line x1="97" y1="36" x2="93" y2="22" stroke="#FF9800" stroke-width="2.5" stroke-linecap="round"/>

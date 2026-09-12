@@ -1,3 +1,11 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+}
+
 .navbar {
   background-color: #A03037;
   color: #ffffff;
@@ -7,6 +15,7 @@
   height: 52px;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .navbar-content {
